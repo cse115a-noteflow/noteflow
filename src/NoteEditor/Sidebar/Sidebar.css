@@ -1,0 +1,49 @@
+.sidebar {
+  height: calc(100% - 32px);
+  background-color: #d9d9d9;
+  width: 400px;
+  padding: 16px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.sidebar-header h2, .sidebar-header p {
+  margin: 0;
+}
+
+.sidebar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 0;
+  align-items: stretch;
+  border-bottom: 1px solid #000;
+}
+
+.search {
+  display: flex;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #fff;
+  border-radius: 25px;
+}
+
+.search input {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  font-size: unset;
+  width: 100%;
+}
+
+.note-filters {
+  padding: 16px 0;
+  display: flex;
+  gap: 8px;
+}

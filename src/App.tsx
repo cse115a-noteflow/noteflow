@@ -1,4 +1,6 @@
-import './App.css';
+import { useState } from 'react';
+import NoteEditor from './NoteEditor/NoteEditor';
+import API from './lib/API';
 
 // Import Firebase modules
 import { initializeApp } from 'firebase/app';
@@ -10,13 +12,13 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 
 // Initialize Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyBT8w1img6usS8Bx4LSlFza_DD3-G2RWBk",
-  authDomain: "noteflow-77eb6.firebaseapp.com",
-  projectId: "noteflow-77eb6",
-  storageBucket: "noteflow-77eb6.firebasestorage.app",
-  messagingSenderId: "212131836065",
-  appId: "1:212131836065:web:328e7d473d67a1279fc0e0",
-  measurementId: "G-4BQNZ69GHR"
+  apiKey: 'AIzaSyBT8w1img6usS8Bx4LSlFza_DD3-G2RWBk',
+  authDomain: 'noteflow-77eb6.firebaseapp.com',
+  projectId: 'noteflow-77eb6',
+  storageBucket: 'noteflow-77eb6.firebasestorage.app',
+  messagingSenderId: '212131836065',
+  appId: '1:212131836065:web:328e7d473d67a1279fc0e0',
+  measurementId: 'G-4BQNZ69GHR'
 };
 
 const app = initializeApp(firebaseConfig);
@@ -24,34 +26,32 @@ const auth = getAuth(app);
 const firestore = getFirestore(app);
 
 function App() {
-
+  const [api, setApi] = useState(new API('token'));
   const [user] = useAuthState(auth);
 
-  console.log("User:", user);
+  console.log('User:', user);
+
+  // todo: routing
+  return <NoteEditor id="1" api={api} />;
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>NoteFlow</p>
-        {user ? <Notebook /> : <SignIn />}
-        
-      </header>
+    <div className="app">
+      <header className="app-header">{user ? 'true' : <SignIn />}</header>
     </div>
   );
 }
 
 function SignIn() {
-  
-  console.log("Sign In");
+  console.log('Sign In');
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
     } catch (error) {
-      console.error("Error signing in: ", error);
+      console.error('Error signing in: ', error);
     }
   };
-  
+
   return (
     <div>
       <p>Sign in to start taking notes</p>
@@ -61,18 +61,14 @@ function SignIn() {
 }
 
 function SignOut() {
-  console.log("Sign Out");
-  return auth.currentUser && (
-    <button className="sign-out" onClick={() => auth.signOut()}>Sign Out</button>
-  )
+  console.log('Sign Out');
+  return (
+    auth.currentUser && (
+      <button className="sign-out" onClick={() => auth.signOut()}>
+        Sign Out
+      </button>
+    )
+  );
 }
 
-
-function Notebook() {
-  // Add your Notebook component implementation here
-  return <div>
-          <SignOut />
-          <p>Notebook Component</p>
-        </div>;
-}
 export default App;
