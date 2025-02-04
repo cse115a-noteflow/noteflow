@@ -1,5 +1,6 @@
 import Note from './Note';
-import { SerializedNote } from './types';
+import { FailureResponse, SerializedNote } from './types';
+import axios from 'axios';
 
 export const DEFAULT_DATA: SerializedNote = {
   id: '1',
@@ -9,7 +10,7 @@ export const DEFAULT_DATA: SerializedNote = {
     {
       id: '1',
       type: 'text',
-      position: { x: 0, y: 0, zIndex: 0 },
+      position: null,
       value: 'This is a sample note. Look, we can have formatting and everything!',
       style: {
         formatting: [
@@ -56,6 +57,16 @@ export const DEFAULT_DATA: SerializedNote = {
   }
 };
 
+const ENDPOINT = 'http://localhost:3000/api/v1';
+
+interface MediaResponse {
+  success: true;
+  id: string;
+  value: string;
+  width: number;
+  height: number;
+}
+
 /**
  * Tools for interacting with the app's REST API.
  * Websocket data is located in the Note class.
@@ -77,7 +88,7 @@ class API {
    * @returns API
    */
   static loginByCredentials(email: string, password: string) {
-    // login here
+    // TODO: implement login
     return new API('token');
   }
 
@@ -88,6 +99,20 @@ class API {
 
   async getNoteById(id: string): Promise<Note | null> {
     return new Note(DEFAULT_DATA);
+  }
+
+  async uploadMedia(formData: FormData): Promise<MediaResponse | FailureResponse> {
+    const response = await axios.post(ENDPOINT + '/media', formData, {
+      headers: {
+        Authorization: 'Bearer ' + this.token
+      }
+    });
+    const data = await response.data;
+    return data;
+  }
+
+  getMediaURL(id: string) {
+    return ENDPOINT + '/media/' + id;
   }
 }
 

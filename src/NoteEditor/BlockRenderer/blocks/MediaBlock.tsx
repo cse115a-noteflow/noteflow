@@ -1,5 +1,6 @@
 import Note from '../../../lib/Note';
 import type { MediaBlock as MediaBlockType } from '../../../lib/types';
+import '../Block.css';
 
 function MediaBlock({ note, block }: { note: Note; block: MediaBlockType }) {
   return (

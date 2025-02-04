@@ -3,14 +3,16 @@ import Note from '../../lib/Note';
 import MediaBlock from './blocks/MediaBlock';
 import ScribbleBlock from './blocks/ScribbleBlock';
 import TextBlock from './blocks/TextBlock';
+import DebugPreview from './DebugPreview';
+import './Block.css';
 
 function BlockRenderer({ note }: { note: Note }) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, forceUpdate] = useState(0);
 
   useEffect(() => {
-    const update = () => {
-      forceUpdate((prev) => prev + 1);
+    const update = (type: string) => {
+      if (type === 'noteUpdate') forceUpdate((prev) => prev + 1);
     };
 
     note.addListener(update);
@@ -31,6 +33,7 @@ function BlockRenderer({ note }: { note: Note }) {
             return null;
         }
       })}
+      <DebugPreview note={note} />
     </div>
   );
 }

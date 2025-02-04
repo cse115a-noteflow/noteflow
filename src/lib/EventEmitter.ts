@@ -1,16 +1,18 @@
-class EventEmitter {
-  listeners: Array<() => void> = [];
+type Listener = (type: string, params?: unknown) => void;
 
-  addListener(listener: () => void) {
+class EventEmitter {
+  listeners: Listener[] = [];
+
+  addListener(listener: Listener) {
     this.listeners.push(listener);
   }
 
-  removeListener(listenerToRemove: () => void) {
+  removeListener(listenerToRemove: Listener) {
     this.listeners = this.listeners.filter((listener) => listenerToRemove !== listener);
   }
 
-  notify() {
-    this.listeners.forEach((listener) => listener());
+  emit(type = 'noteUpdate', params?: unknown) {
+    this.listeners.forEach((listener) => listener(type, params));
   }
 
   getListeners() {

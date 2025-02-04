@@ -22,8 +22,17 @@ function NoteEditor({ id, api }: { id: string; api: API }) {
     <div className="note-editor">
       <Sidebar note={note} api={api} />
       <main>
-        <Toolbar note={note} />
-        <BlockRenderer note={note} />
+        <Toolbar note={note} api={api} />
+        <div className="main-inner">
+          <header>
+            <input
+              className="title"
+              defaultValue={note.title}
+              onChange={(e) => note?.setTitle(e.target.value)}
+            />
+          </header>
+          <BlockRenderer note={note} />
+        </div>
       </main>
     </div>
   );

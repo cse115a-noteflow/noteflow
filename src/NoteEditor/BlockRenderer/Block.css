@@ -1,0 +1,34 @@
+.blocks {
+  width: 100%;
+  height: 100%;
+}
+.block {
+  outline: none;
+  width: 100%;
+}
+.block:focus-visible {
+  background-color: #eee;
+}
+.block.block-text {
+  padding: 12px;
+  width: calc(100% - 24px);
+  white-space: pre;
+}
+.block.block-media {
+  width: 100%;
+}
+.block.block-media img {
+  width: 100%;
+  height: auto;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.debug-preview {
+  width: calc(100% - 2rem);
+  overflow-x: hidden;
+  font-family: monospace;
+  white-space: pre-wrap;
+  padding: 1rem;
+  overflow-wrap: break-word;
+}

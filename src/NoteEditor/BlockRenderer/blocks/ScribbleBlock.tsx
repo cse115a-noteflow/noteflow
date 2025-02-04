@@ -1,5 +1,6 @@
 import Note from '../../../lib/Note';
 import type { ScribbleBlock as ScribbleBlockType } from '../../../lib/types';
+import '../Block.css';
 
 function ScribbleBlock({ note, block }: { note: Note; block: ScribbleBlockType }) {
   return (

@@ -87,6 +87,11 @@ interface User {
   notes: SerializedNote[] | null;
 }
 
+interface FailureResponse {
+  success: false;
+  message: string;
+}
+
 export type {
   SerializedNote,
   Permissions,
@@ -99,5 +104,6 @@ export type {
   MediaBlock,
   Block,
   Usage,
-  User
+  User,
+  FailureResponse
 };
