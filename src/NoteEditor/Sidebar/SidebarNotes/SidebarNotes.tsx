@@ -1,4 +1,4 @@
-import './Sidebar.css';
+import '../Sidebar.css';
 import type API from '../../../lib/API';
 import { Search, FilterAltOutlined, Add } from '@mui/icons-material';
 import Note from '../../../lib/Note';
