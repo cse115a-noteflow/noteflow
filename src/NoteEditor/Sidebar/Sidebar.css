@@ -14,7 +14,22 @@
   gap: 8px;
   align-items: center;
 }
-.sidebar-header h2, .sidebar-header p {
+.sidebar-header h2 {
+  font-size: 1.5em;
+  margin: 0;
+  line-height: 1.25em;
+}
+.sidebar-header input.title {
+  background-color: transparent;
+  white-space: wrap;
+  color: #333;
+  width: 100%;
+  font-size: 1.5em;
+  border: none;
+  border-bottom: 2px solid transparent;
+}
+.sidebar-header h2,
+.sidebar-header p {
   margin: 0;
 }
 

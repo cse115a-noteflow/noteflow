@@ -6,6 +6,13 @@ import { useEffect, useState } from 'react';
 
 function SidebarDetails({ note, api }: { note: Note; api: API }) {
   const [_, forceUpdate] = useState(0);
+  const [editing, setEditing] = useState(false);
+  const [draftName, setDraftName] = useState(note.title);
+
+  const submitName = () => {
+    note?.setTitle(draftName);
+    setEditing(false);
+  };
 
   useEffect(() => {
     const update = (type: string) => {
@@ -16,12 +23,31 @@ function SidebarDetails({ note, api }: { note: Note; api: API }) {
     return () => note.removeListener(update);
   }, []);
 
+  useEffect(() => {
+    if (editing) {
+      const input: HTMLInputElement | null = document.querySelector('.sidebar-details input.title');
+      if (input) {
+        input.focus();
+        input.addEventListener('blur', () => setEditing(false));
+      }
+    }
+  }, [editing]);
+
   return (
     <div className="sidebar-details">
       <div className="sidebar-header">
         <DescriptionOutlined fontSize="large" />
         <div className="text">
-          <h2>{note.title}</h2>
+          {!editing && <h2 onClick={() => setEditing(true)}>{note.title}</h2>}
+          {editing && (
+            <input
+              className="title"
+              defaultValue={draftName}
+              onChange={(e) => setDraftName(e.target.value)}
+              onBlur={submitName}
+              onKeyDown={(e) => e.key === 'Enter' && submitName()}
+            />
+          )}
           <p>{note.description}</p>
         </div>
       </div>

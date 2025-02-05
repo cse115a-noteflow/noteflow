@@ -13,11 +13,7 @@ function DebugPreview({ note }: { note: Note }) {
     return () => note.removeListener(update);
   });
 
-  return (
-    <div className="debug-preview">
-      <span>{JSON.stringify(note.content, null, 2)}</span>
-    </div>
-  );
+  return <div className="debug-preview">{JSON.stringify(note.content, null, 2)}</div>;
 }
 
 export default DebugPreview;

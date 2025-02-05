@@ -67,12 +67,16 @@ class Note extends EventEmitter {
 
   /* Adding content */
 
-  addTextBlock() {
+  addTextBlock(start = false) {
     const newBlock: TextBlock = {
       ...JSON.parse(JSON.stringify(DEFAULT_TEXT_BLOCK)),
       id: v4()
     };
-    this.content.push(newBlock);
+    if (start) {
+      this.content.unshift(newBlock);
+    } else {
+      this.content.push(newBlock);
+    }
     this.emit();
     return newBlock;
   }

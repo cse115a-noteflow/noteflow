@@ -73,6 +73,12 @@ function addRange(
 
 function deleteRange(block: TextBlock, start: number, end: number) {
   console.log('delete', start, end);
+  if (start === 0 && end === block.value.length) {
+    // delete whole value
+    block.value = '';
+    block.style.formatting = [];
+    return block;
+  }
   // remove the text
   block.value = block.value.slice(0, start) + block.value.slice(end);
   // remove the formatting
@@ -158,7 +164,8 @@ function TextBlock({ note, block }: { note: Note; block: TextBlockType }) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const fn = (type: string, params?: unknown) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fn = (type: string, params?: any) => {
       if (params && params.id === block.id) {
         switch (type) {
           case 'blockUpdate':
@@ -167,8 +174,8 @@ function TextBlock({ note, block }: { note: Note; block: TextBlockType }) {
           case 'focus':
             setCaretPosition(
               ref.current as HTMLDivElement,
-              params.start ?? block.value.length,
-              params.end ?? block.value.length
+              Math.min(Math.max(0, params.start ?? Infinity), block.value.length),
+              Math.min(Math.max(0, params.end ?? params.start ?? Infinity), block.value.length)
             );
             break;
         }
@@ -187,13 +194,61 @@ function TextBlock({ note, block }: { note: Note; block: TextBlockType }) {
     }, 0);
   };
 
+  function moveToPreviousBlock(createNew = false, cursorPos?: number) {
+    const index = note.content.indexOf(block);
+    if (index > 0) {
+      note.emit('focus', { id: note.content[index - 1].id, start: cursorPos });
+    } else {
+      if (createNew) {
+        const newBlock = note.addTextBlock(true);
+        setTimeout(() => note.emit('focus', { id: newBlock.id, start: cursorPos }), 0);
+      } else {
+        setPositionAfterRerender(0, 0);
+      }
+    }
+  }
+
+  function moveToNextBlock(createNew = false, cursorPos?: number) {
+    const index = note.content.indexOf(block);
+    if (index + 1 >= note.content.length) {
+      if (createNew) {
+        const newBlock = note.addTextBlockAfter(block);
+        setTimeout(() => note.emit('focus', { id: newBlock.id, start: cursorPos }), 0);
+      } else {
+        setPositionAfterRerender(block.value.length, block.value.length);
+      }
+    } else {
+      note.emit('focus', { id: note.content[index + 1].id });
+    }
+  }
+
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
-    if (event.ctrlKey || event.altKey) return;
     if (!ref.current) {
       event.preventDefault();
       return;
     }
+    if (event.ctrlKey || event.altKey) return;
+
+    // TAB - Move between blocks
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      if (event.shiftKey) {
+        moveToPreviousBlock();
+      } else {
+        moveToNextBlock();
+      }
+      return;
+    }
+
     const position = getCaretPosition(ref.current) || [0, 0];
+
+    // TODO: implement multiselection (shift + arrows)
+    if (event.key === 'ArrowUp') {
+      moveToPreviousBlock(false, position[0]);
+    }
+    if (event.key === 'ArrowDown') {
+      moveToNextBlock(true, position[0]);
+    }
 
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
       return;
@@ -203,20 +258,23 @@ function TextBlock({ note, block }: { note: Note; block: TextBlockType }) {
     event.preventDefault();
 
     if (event.key === 'Enter') {
+      // Add a new text block
       const valueAfter = block.value.slice(position[1]);
       const newBlock = note.addTextBlockAfter(block);
       addRange(newBlock, valueAfter, block.style.formatting, 0, position[1]);
       deleteRange(block, position[0], block.value.length);
       setTimeout(() => note.emit('focus', { id: newBlock.id, start: 0, end: 0 }), 0);
     } else if (event.key === 'Backspace') {
+      // Delete characters
       if (position[0] === 0 && position[1] === 0) {
+        // delete the block if empty and at start of block
         const index = note.content.indexOf(block);
         if (note.content.length === 1 || index === 0) return;
-        // delete the block
         const previousBlock = note.content[index - 1];
         note.deleteBlock(block);
         setTimeout(() => note.emit('focus', { id: previousBlock.id }), 0);
       } else {
+        // delete the character before the caret / selection
         if (position[0] === position[1]) {
           position[0] -= 1;
         }
@@ -224,8 +282,12 @@ function TextBlock({ note, block }: { note: Note; block: TextBlockType }) {
         setPositionAfterRerender(position[0], position[0]);
       }
     } else if (event.key.length === 1) {
+      // Add a character, deleting current selection as necessary
+      if (position[0] !== position[1]) {
+        deleteRange(block, position[0], position[1]);
+      }
       addRange(block, event.key, [], position[0]);
-      setPositionAfterRerender(position[0] + 1, position[1] + 1);
+      setPositionAfterRerender(position[0] + 1, position[0] + 1);
     }
     note.emit('blockUpdate', { id: block.id });
   }
@@ -253,13 +315,20 @@ function TextBlock({ note, block }: { note: Note; block: TextBlockType }) {
         };
         if (range.link) {
           return (
-            <a key={index} href={range.link} target="_blank" rel="noreferrer" style={style}>
+            <a
+              className={range.types.join(' ')}
+              key={index}
+              href={range.link}
+              target="_blank"
+              rel="noreferrer"
+              style={style}
+            >
               {range.value}
             </a>
           );
         } else {
           return (
-            <span key={index} style={style}>
+            <span className={range.types.join(' ')} key={index} style={style}>
               {range.value}
             </span>
           );

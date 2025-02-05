@@ -1,6 +1,7 @@
 .transparentBtn {
   background-color: transparent;
   border: none;
+  padding: 8px;
 }
 .transparentBtn:hover {
   background-color: rgba(0, 0, 0, 0.1);
@@ -14,6 +15,9 @@
   gap: 10px;
   background-color: #eee;
   border-bottom: 1px solid black;
+}
+.toolbar button:focus-visible {
+  outline: none;
 }
 hr {
   width: 1px;

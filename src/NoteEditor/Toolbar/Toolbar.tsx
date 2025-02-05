@@ -1,9 +1,14 @@
-import { Add, Menu } from '@mui/icons-material';
+import { Add, Edit, Menu, TextFields } from '@mui/icons-material';
 import API from '../../lib/API';
 import Note from '../../lib/Note';
 import './Toolbar.css';
 
 function Toolbar({ note, api }: { note: Note; api: API }) {
+  function addText() {
+    const newBlock = note.addTextBlock();
+    setTimeout(() => note.emit('focus', { id: newBlock.id }), 0);
+  }
+
   async function addMedia() {
     const input = document.createElement('input');
     input.type = 'file';
@@ -38,10 +43,14 @@ function Toolbar({ note, api }: { note: Note; api: API }) {
       </button>
       <hr />
       <div className="tools-text">
-        <button onClick={() => note.addTextBlock()}>Text</button>
+        <button onClick={addText}>
+          <TextFields />
+        </button>
       </div>
       <div className="tools-scribble">
-        <button onClick={() => note.addScribbleBlock()}>Scribble</button>
+        <button onClick={() => note.addScribbleBlock()}>
+          <Edit />
+        </button>
       </div>
       <div className="tools-media">
         <button onClick={addMedia}>

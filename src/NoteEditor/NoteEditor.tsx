@@ -24,13 +24,6 @@ function NoteEditor({ id, api }: { id: string; api: API }) {
       <main>
         <Toolbar note={note} api={api} />
         <div className="main-inner">
-          <header>
-            <input
-              className="title"
-              defaultValue={note.title}
-              onChange={(e) => note?.setTitle(e.target.value)}
-            />
-          </header>
           <BlockRenderer note={note} />
         </div>
       </main>
