@@ -92,6 +92,12 @@ interface FailureResponse {
   message: string;
 }
 
+// Miscellaneous
+interface FlashCard {
+  term: string;
+  definition: string;
+}
+
 export type {
   SerializedNote,
   Permissions,
@@ -105,5 +111,6 @@ export type {
   Block,
   Usage,
   User,
-  FailureResponse
+  FailureResponse,
+  FlashCard
 };

@@ -98,7 +98,7 @@ class API {
   }
 
   async getNoteById(id: string): Promise<Note | null> {
-    return new Note(DEFAULT_DATA);
+    return new Note(DEFAULT_DATA, this);
   }
 
   async uploadMedia(formData: FormData): Promise<MediaResponse | FailureResponse> {

@@ -1,6 +1,8 @@
+import API from './API';
 import EventEmitter from './EventEmitter';
 import {
   Block,
+  FlashCard,
   MediaBlock,
   Permissions,
   ScribbleBlock,
@@ -38,8 +40,9 @@ class Note extends EventEmitter {
   content: Block[];
   owner: User;
   permissions: Permissions;
+  api: API;
 
-  constructor(note: SerializedNote) {
+  constructor(note: SerializedNote, api: API) {
     super();
     this.id = note.id;
     this.title = note.title;
@@ -47,6 +50,7 @@ class Note extends EventEmitter {
     this.content = note.content;
     this.owner = note.owner;
     this.permissions = note.permissions;
+    this.api = api;
   }
 
   save(): SerializedNote {
@@ -130,6 +134,30 @@ class Note extends EventEmitter {
 
   blockUpdate(block: Block) {
     this.emit();
+  }
+
+  /* AI Integrations */
+
+  /**
+   * Generates study materials for the note
+   * @returns a list of FlashCards, or null if the request failed.
+   */
+  async generateStudyMaterials(): Promise<FlashCard[] | null> {
+    // api call
+    return [
+      {
+        term: 'term 1',
+        definition: 'definition 1'
+      },
+      {
+        term: 'term 2',
+        definition: 'definition 2'
+      },
+      {
+        term: 'term 3',
+        definition: 'definition 3'
+      }
+    ];
   }
 }
 
