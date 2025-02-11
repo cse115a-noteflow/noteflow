@@ -97,6 +97,23 @@ class Note extends EventEmitter {
     return newBlock;
   }
 
+  addTextBlockWithString(value: string = '', start = false) {
+    const newBlock: TextBlock = {
+      ...JSON.parse(JSON.stringify(DEFAULT_TEXT_BLOCK)),
+      id: v4(),
+      value // ✅ Now accepts a string input
+    };
+
+    if (start) {
+        this.content.unshift(newBlock);
+    } else {
+        this.content.push(newBlock);
+    }
+
+    this.emit();
+    return newBlock;
+  }
+
   addScribbleBlock() {
     const newBlock: ScribbleBlock = {
       ...JSON.parse(JSON.stringify(DEFAULT_SCRIBBLE_BLOCK)),
@@ -142,6 +159,86 @@ class Note extends EventEmitter {
    * Generates study materials for the note
    * @returns a list of FlashCards, or null if the request failed.
    */
+  async summarizeTextBlocks() {
+    // Step 1: Collect all text from text blocks
+    
+    const textBlocks = this.content
+        .filter(block => block.type === "text")
+        .map(block => (block as TextBlock).value.trim()) // Ensure it's a TextBlock
+
+    // If there's no text, don't make an API call
+    
+    if (textBlocks.length === 0) {
+        
+        return;
+    }
+
+    // Step 2: Construct a prompt
+    const prompt = `Summarize the following text:\n\n${textBlocks.join()}`;
+
+    try {
+        // Step 3: Send request to OpenAI
+        const response = await fetch("http://127.0.0.1:5000/ai/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: prompt })
+        });
+
+        const data = await response.json();
+        console.log("Summary Response:", data);
+
+        // Step 4: Add the summary as a new text block
+        if (data.success) {
+            this.addTextBlockWithString(`Summary:\n\n${data.response.trim()}`);
+        } else {
+            //this.addTextBlockWithString(`Error: ${data.error || "Failed to generate summary."}`);
+        }
+    } catch (error) {
+          console.error("Error summarizing text blocks:", error);
+          //this.addTextBlockWithString("Error: Could not generate summary.");
+    }
+  }
+
+  async generateFlashCards() {
+    // Step 1: Collect all text from text blocks
+    
+    const textBlocks = this.content
+        .filter(block => block.type === "text")
+        .map(block => (block as TextBlock).value.trim()) // Ensure it's a TextBlock
+
+    // If there's no text, don't make an API call
+    
+    if (textBlocks.length === 0) {
+        
+        return;
+    }
+
+    // Step 2: Construct a prompt
+    const prompt = `Create a JSON list of quizlet style flashcards based on this text, return no text other than the json list:\n\n${textBlocks.join()}`;
+
+    try {
+        // Step 3: Send request to OpenAI
+        const response = await fetch("http://127.0.0.1:5000/ai/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: prompt })
+        });
+
+        const data = await response.json();
+        console.log("Summary Response:", data);
+
+        // Step 4: Add the summary as a new text block
+        if (data.success) {
+            this.addTextBlockWithString(`${data.response.trim()}`);
+        } else {
+            //this.addTextBlockWithString(`Error: ${data.error || "Failed to generate summary."}`);
+        }
+    } catch (error) {
+          console.error("Error summarizing text blocks:", error);
+          //this.addTextBlockWithString("Error: Could not generate summary.");
+    }
+  }
+
   async generateStudyMaterials(): Promise<FlashCard[] | null> {
     // api call
     return [
@@ -160,5 +257,7 @@ class Note extends EventEmitter {
     ];
   }
 }
+
+
 
 export default Note;
