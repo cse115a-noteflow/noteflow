@@ -4,7 +4,6 @@ import './Study.css';
 function Study({ note }: { note: Note }) {
   // Write logic here
   // You can also create other components and import them, for cleaner code.
-
   // Here's an example function that may help.
   // Note that it is asynchronous (it takes time to generate!), so
   // you'll need to take that into account.
@@ -16,6 +15,7 @@ function Study({ note }: { note: Note }) {
       // do something with the list of flashcards
     }
   }
+
 
   return (
     <div className="study">
