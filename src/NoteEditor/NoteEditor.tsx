@@ -6,27 +6,36 @@ import Toolbar from './Toolbar/Toolbar';
 import BlockRenderer from './BlockRenderer/BlockRenderer';
 import './NoteEditor.css';
 
-function NoteEditor({ id, api }: { id: string; api: API }) {
+function NoteEditor({ api }: { api: API }) {
   const [note, setNote] = useState<null | Note>(null);
+  const [id, setId] = useState<string | null>(null);
 
   useEffect(() => {
-    api.getNoteById(id).then(setNote).catch(console.error);
+    if (id !== null && note && note.id !== id) {
+      setNote(null);
+      api.getNote(id).then(setNote).catch(console.error);
+    } else if (id === null && note === null) {
+      setNote(new Note(null, api));
+      setTimeout(() => {
+        // Focus first note block
+        const block = document.querySelector('.note-editor .block.block-text');
+        if (block) (block as HTMLElement).focus();
+      }, 0);
+    }
   }, [id]);
-
-  if (note === null) {
-    // loading state
-    return <div>Loading...</div>;
-  }
 
   return (
     <div className="note-editor">
-      <Sidebar note={note} api={api} />
-      <main>
-        <Toolbar note={note} api={api} />
-        <div className="main-inner">
-          <BlockRenderer note={note} />
-        </div>
-      </main>
+      <Sidebar note={note} setId={setId} api={api} />
+      {note === null && <div>Loading...</div>}
+      {note !== null && (
+        <main>
+          <Toolbar note={note} api={api} />
+          <div className="main-inner">
+            <BlockRenderer note={note} />
+          </div>
+        </main>
+      )}
     </div>
   );
 }

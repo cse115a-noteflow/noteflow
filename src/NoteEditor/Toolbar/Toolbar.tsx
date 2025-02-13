@@ -2,10 +2,18 @@ import { Add, Edit, Menu, TextFields } from '@mui/icons-material';
 import API from '../../lib/API';
 import Note from '../../lib/Note';
 import './Toolbar.css';
-import { useState } from 'react'
+import { useState } from 'react';
 
 function Toolbar({ note, api }: { note: Note; api: API }) {
+  const [isSaving, setIsSaving] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  async function save() {
+    setIsSaving(true);
+    await note.save();
+    setIsSaving(false);
+  }
+
   function addText() {
     const newBlock = note.addTextBlock();
     setTimeout(() => note.emit('focus', { id: newBlock.id }), 0);
@@ -110,6 +118,9 @@ function Toolbar({ note, api }: { note: Note; api: API }) {
         </button>
         <button onClick={flashcards} disabled={loading}>
           {loading ? "Flashing..." : "Flashcards"}
+        <button>Study</button>
+        <button onClick={save} disabled={isSaving}>
+          Save
         </button>
       </div>
     </div>

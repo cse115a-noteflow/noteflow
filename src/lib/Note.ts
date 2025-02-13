@@ -1,3 +1,4 @@
+import { UserInfo } from 'firebase/auth';
 import API from './API';
 import EventEmitter from './EventEmitter';
 import {
@@ -7,8 +8,7 @@ import {
   Permissions,
   ScribbleBlock,
   SerializedNote,
-  TextBlock,
-  User
+  TextBlock
 } from './types';
 import { v4 } from 'uuid';
 
@@ -38,22 +38,45 @@ class Note extends EventEmitter {
   title: string;
   description: string;
   content: Block[];
-  owner: User;
+  owner: string;
   permissions: Permissions;
   api: API;
 
-  constructor(note: SerializedNote, api: API) {
+  constructor(note: SerializedNote | null, api: API) {
     super();
-    this.id = note.id;
-    this.title = note.title;
-    this.description = note.description;
-    this.content = note.content;
-    this.owner = note.owner;
-    this.permissions = note.permissions;
+    if (note) {
+      this.id = note.id;
+      this.title = note.title;
+      this.description = note.description;
+      this.content = note.content;
+      this.owner = note.owner;
+      this.permissions = note.permissions;
+    } else {
+      this.id = '';
+      this.title = 'Unnamed Note';
+      this.description = '';
+      this.content = [
+        {
+          id: v4(),
+          type: 'text',
+          position: null,
+          value: '',
+          style: {
+            formatting: [],
+            align: 'left'
+          }
+        }
+      ];
+      this.owner = api.user?.uid ?? '';
+      this.permissions = {
+        global: null,
+        user: new Map()
+      };
+    }
     this.api = api;
   }
 
-  save(): SerializedNote {
+  serialize(): SerializedNote {
     return {
       id: this.id,
       title: this.title,
@@ -62,6 +85,12 @@ class Note extends EventEmitter {
       owner: this.owner,
       permissions: this.permissions
     };
+  }
+
+  async save() {
+    const result = await this.api.saveNote(this);
+    if (result !== null) this.emit('save');
+    return result;
   }
 
   setTitle(newTitle: string) {
@@ -148,12 +177,25 @@ class Note extends EventEmitter {
   }
 
   /* Saving content */
+  toString(block?: Block) {
+    if (!block) return this.value;
+
+    return block.value;
+  }
+
+  get value(): string {
+    const content = this.content.filter((x) => x.position === null).map((x) => this.toString(x));
+    return content.join('\n');
+  }
 
   blockUpdate(block: Block) {
     this.emit();
   }
 
   /* AI Integrations */
+  async search(query: string) {
+    return await this.api.search(this.id, query);
+  }
 
   /**
    * Generates study materials for the note

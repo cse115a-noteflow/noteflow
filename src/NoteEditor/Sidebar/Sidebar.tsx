@@ -4,11 +4,19 @@ import Note from '../../lib/Note';
 import SidebarDetails from './SidebarDetails/SidebarDetails';
 import SidebarNotes from './SidebarNotes/SidebarNotes';
 
-function Sidebar({ note, api }: { note: Note; api: API }) {
+function Sidebar({
+  note,
+  setId,
+  api
+}: {
+  note: Note | null;
+  setId: (id: string | null) => void;
+  api: API;
+}) {
   return (
     <div className="sidebar">
-      <SidebarDetails note={note} api={api} />
-      <SidebarNotes note={note} api={api} />
+      {note && <SidebarDetails note={note} />}
+      <SidebarNotes setId={setId} api={api} />
     </div>
   );
 }

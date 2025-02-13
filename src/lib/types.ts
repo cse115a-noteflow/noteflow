@@ -1,9 +1,17 @@
-interface SerializedNote {
+interface PartialNote {
+  id: string;
+  title: string;
+  description: string;
+  owner: string;
+  permissions: Permissions;
+}
+
+interface SerializedNote extends PartialNote {
   id: string;
   title: string;
   description: string;
   content: Block[];
-  owner: User;
+  owner: string;
   permissions: Permissions;
 }
 
@@ -11,7 +19,7 @@ type PermissionState = 'view' | 'edit';
 
 interface Permissions {
   global: PermissionState | null;
-  user: Map<User, PermissionState>;
+  user: Map<string, PermissionState>;
 }
 
 interface Position {
@@ -99,6 +107,7 @@ interface FlashCard {
 }
 
 export type {
+  PartialNote,
   SerializedNote,
   Permissions,
   Position,
