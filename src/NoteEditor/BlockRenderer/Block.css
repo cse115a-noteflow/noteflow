@@ -49,6 +49,14 @@
   padding: 0.2em 0.4em;
   border-radius: 6px;
 }
+.block.block-text.initial::before {
+  content: 'Add text, drawings, files...';
+  color: #555;
+}
+
+.block.block-text.initial:focus::before {
+  content: '';
+}
 
 .block.block-media {
   width: 100%;

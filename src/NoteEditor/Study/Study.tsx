@@ -1,6 +1,6 @@
 import Note from '../../lib/Note';
 import './Study.css';
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 
 function Study({ note }: { note: Note }) {
   // Write logic here
@@ -8,32 +8,31 @@ function Study({ note }: { note: Note }) {
   // Here's an example function that may help.
   // Note that it is asynchronous (it takes time to generate!), so
   // you'll need to take that into account.
-  const[currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [flashcards, setFlashcards] = useState<any[]>([]);
   async function generate() {
     const flashcards = await note.generateStudyMaterials();
     if (flashcards === null) {
-
     } else {
       setFlashcards(flashcards);
     }
   }
   generate();
   // card.onclick = function(){card.classList.toggle("flip")}
-  function nextCard(){
-    setCurrentIndex((currentIndex)=>((currentIndex + 1) % flashcards.length));
+  function nextCard() {
+    setCurrentIndex((currentIndex) => (currentIndex + 1) % flashcards.length);
   }
-  function prevCard(){
-    setCurrentIndex((currentIndex)=>((currentIndex - 1) % flashcards.length));
+  function prevCard() {
+    setCurrentIndex((currentIndex) => (currentIndex - 1) % flashcards.length);
   }
 
-  const toggleFlip =()=>{
+  const toggleFlip = () => {
     const card = document.getElementById('card');
     if (card) {
       card.classList.toggle('flip');
     }
   };
-  
+
   return (
     <div className="study">
       <div className="modal-overlay">
@@ -46,11 +45,14 @@ function Study({ note }: { note: Note }) {
               <h2>{flashcards[currentIndex].definition}</h2>
             </div>
           </div>
-            <div className="nav-content">
-                <button onClick={prevCard}> &lt </button>
-                <h2> {currentIndex}/{flashcards.length} </h2>
-                <button onClick={nextCard}> &gt </button>
-            </div>
+          <div className="nav-content">
+            <button onClick={prevCard}> &lt </button>
+            <h2>
+              {' '}
+              {currentIndex}/{flashcards.length}{' '}
+            </h2>
+            <button onClick={nextCard}> &gt </button>
+          </div>
         </div>
       </div>
     </div>

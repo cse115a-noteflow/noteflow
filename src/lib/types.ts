@@ -3,7 +3,7 @@ interface SerializedNote {
   title: string;
   description: string;
   content: Block[];
-  owner: User;
+  owner: string;
   permissions: Permissions;
 }
 
@@ -11,7 +11,7 @@ type PermissionState = 'view' | 'edit';
 
 interface Permissions {
   global: PermissionState | null;
-  user: Map<User, PermissionState>;
+  user: Map<string, PermissionState>;
 }
 
 interface Position {

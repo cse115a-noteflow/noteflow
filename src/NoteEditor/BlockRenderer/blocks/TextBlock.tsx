@@ -301,7 +301,9 @@ function TextBlock({ note, block }: { note: Note; block: TextBlockType }) {
   return (
     <div
       ref={ref}
-      className="block block-text"
+      className={
+        'block block-text ' + (note.content.length === 1 && block.value === '' ? 'initial' : '')
+      }
       contentEditable
       suppressContentEditableWarning
       onKeyDown={handleKeyDown}

@@ -1,14 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import NoteEditor from './NoteEditor/NoteEditor';
 import API from './lib/API';
 
 // Import Firebase modules
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
 
 // Import React Firebase hooks
 import { useAuthState } from 'react-firebase-hooks/auth';
+import Login from './Login/Login';
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -22,53 +21,29 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const firestore = getFirestore(app);
 
 function App() {
-  const [api, setApi] = useState(new API('token'));
-  const [user] = useAuthState(auth);
+  const [api, setApi] = useState(new API(app));
+  const [user] = useAuthState(api.auth);
+  const [isFirebaseReady, setIsFirebaseReady] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = api.auth.onAuthStateChanged(() => {
+      setIsFirebaseReady(true);
+      unsubscribe();
+    });
+  });
 
   console.log('User:', user);
 
+  if (!user && isFirebaseReady) {
+    return <Login api={api} />;
+  } else if (!user) {
+    return <div>Loading...</div>;
+  }
+
   // todo: routing
-  return <NoteEditor id="1" api={api} />;
-
-  return (
-    <div className="app">
-      <header className="app-header">{user ? 'true' : <SignIn />}</header>
-    </div>
-  );
-}
-
-function SignIn() {
-  console.log('Sign In');
-  const signInWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error('Error signing in: ', error);
-    }
-  };
-
-  return (
-    <div>
-      <p>Sign in to start taking notes</p>
-      <button onClick={signInWithGoogle}>Sign in with Google</button>
-    </div>
-  );
-}
-
-function SignOut() {
-  console.log('Sign Out');
-  return (
-    auth.currentUser && (
-      <button className="sign-out" onClick={() => auth.signOut()}>
-        Sign Out
-      </button>
-    )
-  );
+  return <NoteEditor api={api} />;
 }
 
 export default App;
