@@ -1,6 +1,6 @@
 import { FirebaseApp } from 'firebase/app';
 import Note from './Note';
-import { FailureResponse, SerializedNote } from './types';
+import { FailureResponse, PartialNote, SerializedNote } from './types';
 import axios from 'axios';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
@@ -82,7 +82,7 @@ class API {
   private async POST(path: string, data: unknown, headers?: object) {
     const response = await axios.post(ENDPOINT + path, data, {
       headers: {
-        Authorization: 'Bearer ' + this.token,
+        Authorization: 'Bearer ' + (await this.token),
         ...headers
       }
     });
@@ -97,7 +97,7 @@ class API {
   private async PUT(path: string, data: unknown, headers?: object) {
     const response = await axios.put(ENDPOINT + path, data, {
       headers: {
-        Authorization: 'Bearer ' + this.token,
+        Authorization: 'Bearer ' + (await this.token),
         ...headers
       }
     });
@@ -112,7 +112,7 @@ class API {
   private async DELETE(path: string, headers?: object) {
     const response = await axios.delete(ENDPOINT + path, {
       headers: {
-        Authorization: 'Bearer ' + this.token,
+        Authorization: 'Bearer ' + (await this.token),
         ...headers
       }
     });
@@ -127,7 +127,7 @@ class API {
   private async GET(path: string, headers?: object): Promise<[number, unknown]> {
     const response = await axios.get(ENDPOINT + path, {
       headers: {
-        Authorization: 'Bearer ' + this.token,
+        Authorization: 'Bearer ' + (await this.token),
         ...headers
       }
     });
@@ -177,13 +177,24 @@ class API {
   }
 
   // METHODS
-  async getNotes(): Promise<SerializedNote[]> {
-    return [DEFAULT_DATA];
+  async getNotes(query?: string, cursor?: string) {
+    let url = '/notes';
+    const params = [];
+    if (query) params.push(`q=${encodeURIComponent(query)}`);
+    if (cursor) params.push(`cursor=${cursor}`);
+    if (params.length) url += '?' + params.join('&');
+    const [status, data] = await this.GET(url);
+    if (status !== 200) return null;
+    return data as { results: PartialNote[]; cursor: string };
   }
 
   async getNote(id: string): Promise<Note | null> {
-    const response = await this.GET(`/notes/${id}`);
-    return response[1] as Note | null;
+    const response = (await this.GET(`/notes/${id}`)) as [
+      number,
+      { success: boolean; data: SerializedNote }
+    ];
+    if (response[0] !== 200) return null;
+    return new Note(response[1].data, this);
   }
 
   async saveNote(note: Note): Promise<Note | null> {
@@ -224,7 +235,7 @@ class API {
 
   async search(id: string, query: string): Promise<string | null> {
     const response = await this.GET(`/notes/${id}/search?q=${encodeURIComponent(query)}`);
-    return (response[1] as { results: string }).results;
+    return (response[1] as { data: string }).data;
   }
 }
 

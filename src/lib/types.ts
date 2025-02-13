@@ -1,4 +1,12 @@
-interface SerializedNote {
+interface PartialNote {
+  id: string;
+  title: string;
+  description: string;
+  owner: string;
+  permissions: Permissions;
+}
+
+interface SerializedNote extends PartialNote {
   id: string;
   title: string;
   description: string;
@@ -99,6 +107,7 @@ interface FlashCard {
 }
 
 export type {
+  PartialNote,
   SerializedNote,
   Permissions,
   Position,

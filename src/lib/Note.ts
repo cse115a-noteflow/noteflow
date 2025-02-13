@@ -88,7 +88,9 @@ class Note extends EventEmitter {
   }
 
   async save() {
-    return await this.api.saveNote(this);
+    const result = await this.api.saveNote(this);
+    if (result !== null) this.emit('save');
+    return result;
   }
 
   setTitle(newTitle: string) {

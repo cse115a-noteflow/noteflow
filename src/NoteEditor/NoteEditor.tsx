@@ -12,6 +12,7 @@ function NoteEditor({ api }: { api: API }) {
 
   useEffect(() => {
     if (id !== null && note && note.id !== id) {
+      setNote(null);
       api.getNote(id).then(setNote).catch(console.error);
     } else if (id === null && note === null) {
       setNote(new Note(null, api));

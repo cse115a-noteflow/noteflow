@@ -15,8 +15,8 @@ function Sidebar({
 }) {
   return (
     <div className="sidebar">
-      {note && <SidebarDetails note={note} setId={setId} api={api} />}
-      <SidebarNotes note={note} setId={setId} api={api} />
+      {note && <SidebarDetails note={note} />}
+      <SidebarNotes setId={setId} api={api} />
     </div>
   );
 }
