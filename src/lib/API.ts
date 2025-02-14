@@ -45,14 +45,7 @@ export const DEFAULT_DATA: SerializedNote = {
       }
     }
   ],
-  owner: {
-    id: '1',
-    name: 'John Doe',
-    photo: null,
-    email: 'john@doe.com',
-    usage: null,
-    notes: null
-  },
+  owner: '1',
   permissions: {
     global: 'edit',
     user: new Map()
@@ -236,6 +229,18 @@ class API {
   async search(id: string, query: string): Promise<string | null> {
     const response = await this.GET(`/notes/${id}/search?q=${encodeURIComponent(query)}`);
     return (response[1] as { data: string }).data;
+  }
+
+  async generateSummary(id: string, value?: string): Promise<string | null> {
+    const response = await this.POST(`/ai/summarize`, { id, value });
+    if (response[0] !== 200) return null;
+    return (response[1] as { data: string }).data;
+  }
+
+  async generateFlashcards(id: string, value?: string) {
+    const response = await this.POST(`/ai/flashcards`, { id, value });
+    if (response[0] !== 200) return null;
+    return (response[1] as { data: Array<{ term: string; definition: string }> }).data;
   }
 }
 

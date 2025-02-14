@@ -5,10 +5,12 @@ import Sidebar from './Sidebar/Sidebar';
 import Toolbar from './Toolbar/Toolbar';
 import BlockRenderer from './BlockRenderer/BlockRenderer';
 import './NoteEditor.css';
+import Study from './Study/Study';
 
 function NoteEditor({ api }: { api: API }) {
   const [note, setNote] = useState<null | Note>(null);
   const [id, setId] = useState<string | null>(null);
+  const [studyShown, setStudyShown] = useState(false);
 
   useEffect(() => {
     if (id !== null && note && note.id !== id) {
@@ -27,10 +29,11 @@ function NoteEditor({ api }: { api: API }) {
   return (
     <div className="note-editor">
       <Sidebar note={note} setId={setId} api={api} />
+      {note !== null && studyShown && <Study note={note} setStudyShown={setStudyShown} />}
       {note === null && <div>Loading...</div>}
       {note !== null && (
         <main>
-          <Toolbar note={note} api={api} />
+          <Toolbar note={note} setStudyShown={setStudyShown} />
           <div className="main-inner">
             <BlockRenderer note={note} />
           </div>
