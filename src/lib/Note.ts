@@ -1,4 +1,3 @@
-import { UserInfo } from 'firebase/auth';
 import API from './API';
 import EventEmitter from './EventEmitter';
 import {
@@ -100,10 +99,11 @@ class Note extends EventEmitter {
 
   /* Adding content */
 
-  addTextBlock(start = false) {
+  addTextBlock(start = false, value = '') {
     const newBlock: TextBlock = {
       ...JSON.parse(JSON.stringify(DEFAULT_TEXT_BLOCK)),
-      id: v4()
+      id: v4(),
+      value
     };
     if (start) {
       this.content.unshift(newBlock);
@@ -180,26 +180,12 @@ class Note extends EventEmitter {
     return await this.api.search(this.id, query);
   }
 
-  /**
-   * Generates study materials for the note
-   * @returns a list of FlashCards, or null if the request failed.
-   */
-  async generateStudyMaterials(): Promise<FlashCard[] | null> {
-    // api call
-    return [
-      {
-        term: 'term 1',
-        definition: 'definition 1'
-      },
-      {
-        term: 'term 2',
-        definition: 'definition 2'
-      },
-      {
-        term: 'term 3',
-        definition: 'definition 3'
-      }
-    ];
+  async generateSummary(): Promise<string | null> {
+    return await this.api.generateSummary(this.id);
+  }
+
+  async generateFlashcards(): Promise<FlashCard[] | null> {
+    return await this.api.generateFlashcards(this.id);
   }
 }
 

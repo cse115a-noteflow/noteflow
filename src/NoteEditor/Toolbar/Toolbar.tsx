@@ -1,10 +1,9 @@
 import { Add, Edit, Menu, TextFields } from '@mui/icons-material';
-import API from '../../lib/API';
 import Note from '../../lib/Note';
 import './Toolbar.css';
 import { useState } from 'react';
 
-function Toolbar({ note, api }: { note: Note; api: API }) {
+function Toolbar({ note, setStudyShown }: { note: Note; setStudyShown: (value: boolean) => void }) {
   const [isSaving, setIsSaving] = useState(false);
 
   async function save() {
@@ -69,7 +68,7 @@ function Toolbar({ note, api }: { note: Note; api: API }) {
       <div style={{ flexGrow: '1' }} />
       <div className="tools-share">
         <button>Share</button>
-        <button>Study</button>
+        <button onClick={() => setStudyShown(true)}>Study</button>
         <button onClick={save} disabled={isSaving}>
           Save
         </button>
