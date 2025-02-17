@@ -2,6 +2,7 @@ import { Add, Edit, Menu, TextFields } from '@mui/icons-material';
 import Note from '../../lib/Note';
 import './Toolbar.css';
 import { useState } from 'react';
+import getAuthToken from '../../services/getAuthToken';
 
 function Toolbar({ note, setStudyShown }: { note: Note; setStudyShown: (value: boolean) => void }) {
   const [isSaving, setIsSaving] = useState(false);
@@ -44,6 +45,33 @@ function Toolbar({ note, setStudyShown }: { note: Note; setStudyShown: (value: b
     };
   }
 
+  async function shareNote() {
+    const recipientEmail = prompt("Enter the email of the user you want to share this note with:");
+    if (!recipientEmail) return;
+
+    try {
+      const authToken = await getAuthToken(); // Implement this function to get the Firebase token
+      const response = await fetch(`/notes/${note.id}/share`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${authToken}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email: recipientEmail, permission: "editor" })
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        alert(`Note shared successfully with ${recipientEmail}`);
+      } else {
+        alert(`Error: ${result.error}`);
+      }
+    } catch (error) {
+      console.error("Error sharing note:", error);
+      alert("An unexpected error occurred.");
+    }
+  }
+
   return (
     <div className="toolbar">
       <button className="transparentBtn">
@@ -67,7 +95,7 @@ function Toolbar({ note, setStudyShown }: { note: Note; setStudyShown: (value: b
       </div>
       <div style={{ flexGrow: '1' }} />
       <div className="tools-share">
-        <button>Share</button>
+        <button onClick={shareNote}>Share</button>
         <button onClick={() => setStudyShown(true)}>Study</button>
         <button onClick={save} disabled={isSaving}>
           Save

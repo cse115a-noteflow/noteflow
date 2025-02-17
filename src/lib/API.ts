@@ -3,6 +3,9 @@ import Note from './Note';
 import { FailureResponse, PartialNote, SerializedNote } from './types';
 import axios from 'axios';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { updateDoc } from "firebase/firestore"
+import { NotePermissionState } from './types';
+
 
 export const DEFAULT_DATA: SerializedNote = {
   id: '1',
@@ -48,7 +51,7 @@ export const DEFAULT_DATA: SerializedNote = {
   owner: '1',
   permissions: {
     global: 'edit',
-    user: new Map()
+    user: {}
   }
 };
 
@@ -220,6 +223,8 @@ class API {
     return ENDPOINT + '/media/' + id;
   }
 
+  
+
   // AI
   async searchNotes(query: string): Promise<SerializedNote[]> {
     const response = await this.GET(`/search?q=${encodeURIComponent(query)}`);
@@ -241,6 +246,46 @@ class API {
     const response = await this.POST(`/ai/flashcards`, { id, value });
     if (response[0] !== 200) return null;
     return (response[1] as { data: Array<{ term: string; definition: string }> }).data;
+  }
+
+  /* Permissions */
+  async hasPermission(noteId: string, permission: NotePermissionState): Promise<boolean> {
+    const userId = this.user?.uid;
+    if (!userId) return false;
+  
+    try {
+      const note = await this.getNoteById(noteId);
+      if (!note) return false;
+  
+      // Owners always have full permissions
+      if (note.owner === userId) return true;
+  
+      // Check global permission first
+      if (note.permissions?.global?.includes(permission)) {
+        return true;
+      }
+  
+      // Check user-specific permission
+      if (note.permissions?.user?.[userId]?.includes(permission)) {
+        return true;
+      }
+  
+      return false;
+    } catch (error) {
+      console.error("Error checking permissions:", error);
+      return false;
+    }
+  }
+
+  async getNoteById(noteId: string): Promise<PartialNote | null> {
+    try {
+      const [status, data] = await this.GET(`/notes/${noteId}`);
+      if (status !== 200 || !data) return null;
+      return data as PartialNote;
+    } catch (error) {
+      console.error("Error fetching note:", error);
+      return null;
+    }
   }
 }
 

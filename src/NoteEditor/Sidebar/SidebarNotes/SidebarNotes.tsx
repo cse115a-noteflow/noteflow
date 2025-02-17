@@ -4,6 +4,7 @@ import { Search, FilterAltOutlined, Add, DescriptionOutlined } from '@mui/icons-
 import { useEffect, useState } from 'react';
 import { PartialNote } from '../../../lib/types';
 
+
 function SidebarNotes({ setId, api }: { setId: (id: string | null) => void; api: API }) {
   const [notes, setNotes] = useState<PartialNote[] | null>(null);
   const [cursor, setCursor] = useState<string | null>(null);
@@ -14,8 +15,11 @@ function SidebarNotes({ setId, api }: { setId: (id: string | null) => void; api:
     setLoading(true);
     const result = await api.getNotes(undefined, cursor ?? undefined);
     if (result) {
+      const filteredNotes = result.results.filter((note) =>
+        api.hasPermission(note.id, "view") || api.hasPermission(note.id, "edit") || note.owner === api.user?.uid
+      );
       setNotes(
-        [...(notes || []), ...result.results].filter(
+        [...(notes || []), ...filteredNotes].filter(
           // Remove duplicates
           (note, index, self) => self.findIndex((n) => n.id === note.id) === index
         )

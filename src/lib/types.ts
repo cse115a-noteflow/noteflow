@@ -15,11 +15,11 @@ interface SerializedNote extends PartialNote {
   permissions: Permissions;
 }
 
-type PermissionState = 'view' | 'edit';
+type NotePermissionState = 'view' | 'edit';
 
 interface Permissions {
-  global: PermissionState | null;
-  user: Map<string, PermissionState>;
+  global: NotePermissionState | null;
+  user: Record<string, NotePermissionState>;
 }
 
 interface Position {
@@ -110,6 +110,7 @@ export type {
   PartialNote,
   SerializedNote,
   Permissions,
+  NotePermissionState,
   Position,
   Format,
   TextRange,

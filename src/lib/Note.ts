@@ -69,7 +69,7 @@ class Note extends EventEmitter {
       this.owner = api.user?.uid ?? '';
       this.permissions = {
         global: null,
-        user: new Map()
+        user: {}
       };
     }
     this.api = api;
@@ -175,6 +175,8 @@ class Note extends EventEmitter {
     this.emit();
   }
 
+
+
   /* AI Integrations */
   async search(query: string) {
     return await this.api.search(this.id, query);
@@ -188,5 +190,7 @@ class Note extends EventEmitter {
     return await this.api.generateFlashcards(this.id);
   }
 }
+
+
 
 export default Note;
