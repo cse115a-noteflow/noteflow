@@ -11,13 +11,16 @@ function SidebarNotes({ setId, api }: { setId: (id: string | null) => void; api:
   const [loading, setLoading] = useState(false);
 
   async function loadMore() {
+    
     if (loading) return;
     setLoading(true);
     const result = await api.getNotes(undefined, cursor ?? undefined);
+    console.log("Fetched notes:", result);
     if (result) {
       const filteredNotes = result.results.filter((note) =>
         api.hasPermission(note.id, "view") || api.hasPermission(note.id, "edit") || note.owner === api.user?.uid
       );
+      
       setNotes(
         [...(notes || []), ...filteredNotes].filter(
           // Remove duplicates

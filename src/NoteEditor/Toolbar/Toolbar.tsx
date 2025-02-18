@@ -51,7 +51,7 @@ function Toolbar({ note, setStudyShown }: { note: Note; setStudyShown: (value: b
 
     try {
       const authToken = await getAuthToken(); // Implement this function to get the Firebase token
-      const response = await fetch(`/notes/${note.id}/share`, {
+      const response = await fetch(`http://localhost:5000/notes/${note.id}/share`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${authToken}`,

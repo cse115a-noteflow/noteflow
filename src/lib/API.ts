@@ -266,7 +266,7 @@ class API {
       }
   
       // Check user-specific permission
-      if (note.permissions?.user?.[userId]?.includes(permission)) {
+      if (note.permissions?.[userId] == (permission)) {
         return true;
       }
   
