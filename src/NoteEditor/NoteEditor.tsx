@@ -6,11 +6,13 @@ import Toolbar from './Toolbar/Toolbar';
 import BlockRenderer from './BlockRenderer/BlockRenderer';
 import './NoteEditor.css';
 import Study from './Study/Study';
+import Share from './Share/Share'
 
 function NoteEditor({ api }: { api: API }) {
   const [note, setNote] = useState<null | Note>(null);
   const [id, setId] = useState<string | null>(null);
   const [studyShown, setStudyShown] = useState(false);
+  const [shareShown, setShareShown] = useState(false);
 
   useEffect(() => {
     if (id !== null && note && note.id !== id) {
@@ -30,10 +32,11 @@ function NoteEditor({ api }: { api: API }) {
     <div className="note-editor">
       <Sidebar note={note} setId={setId} api={api} />
       {note !== null && studyShown && <Study note={note} setStudyShown={setStudyShown} />}
+      {note !== null && shareShown && <Share note={note} setShareShown={setShareShown} />}
       {note === null && <div>Loading...</div>}
       {note !== null && (
         <main>
-          <Toolbar note={note} setStudyShown={setStudyShown} />
+          <Toolbar note={note} setStudyShown={setStudyShown} setShareShown={setShareShown}/>
           <div className="main-inner">
             <BlockRenderer note={note} />
           </div>
