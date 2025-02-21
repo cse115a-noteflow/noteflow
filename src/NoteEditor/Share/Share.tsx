@@ -1,9 +1,12 @@
 import Note from '../../lib/Note';
 import getAuthToken from '../../services/getAuthToken';
 import { useState } from 'react';
+import './Share.css'
 
 function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boolean) => void }) {
     const [userInput, setUserInput] = useState ('');
+    let shareSuccess:boolean = false;
+    let shareFailure:boolean = false;
     async function shareNote() {
         const recipientEmail = userInput;
         if (!recipientEmail) return;
@@ -21,15 +24,27 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
     
           const result = await response.json();
           if (response.ok) {
-            alert(`Note shared successfully with ${recipientEmail}`);
+            shareSuccess = true;
           } else {
-            alert(`Error: ${result.error}`);
+            shareFailure = true;
+            // alert(`Error: ${result.error}`);
           }
         } catch (error) {
-          console.error("Error sharing note:", error);
-          alert("An unexpected error occurred.");
+          shareFailure = true;
+          // console.error("Error sharing note:", error);
+          // alert("An unexpected error occurred.");
         }
       }
+    if(shareSuccess){
+      return (
+        <p>success!</p>
+      );
+    }
+    if(shareFailure){
+      return (
+        <p>sharing failed.</p>
+      );
+    }
     return (
         <div className= "modal" onClick={() => setShareShown(false)}>
             <div className = "modal-inner" onClick={(e) => e.stopPropagation()}>
@@ -40,11 +55,14 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
                     type="text" 
                     placeholder="Enter email address..." 
                     required
-                    onChange={(e) => setUserInput(e.target.value)}>
+                    onChange={(e) => setUserInput(e.target.value)}
+                    className = "email-input">
                 </input>
-                <button id="submitBtn" onClick = {shareNote}>
-                    Submit
-                </button>
+                <div className="cont">
+                  <button id="submitBtn" onClick = {shareNote}>
+                      Submit
+                  </button>
+                </div>
             </div>
         </div>
     );
