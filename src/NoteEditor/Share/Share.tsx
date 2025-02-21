@@ -5,8 +5,8 @@ import './Share.css'
 
 function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boolean) => void }) {
     const [userInput, setUserInput] = useState ('');
-    let shareSuccess:boolean = false;
-    let shareFailure:boolean = false;
+    const [shareSuccess, setShareSuccess] = useState (false);
+    const [shareFailure, setShareFailure] = useState (false);
     async function shareNote() {
         const recipientEmail = userInput;
         if (!recipientEmail) return;
@@ -24,13 +24,13 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
     
           const result = await response.json();
           if (response.ok) {
-            shareSuccess = true;
+            setShareSuccess(true);
           } else {
-            shareFailure = true;
+            setShareFailure(true);
             // alert(`Error: ${result.error}`);
           }
         } catch (error) {
-          shareFailure = true;
+          setShareFailure(true);
           // console.error("Error sharing note:", error);
           // alert("An unexpected error occurred.");
         }
