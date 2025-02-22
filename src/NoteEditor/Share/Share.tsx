@@ -37,12 +37,20 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
       }
     if(shareSuccess){
       return (
-        <p>success!</p>
+        <div className= "modal" onClick={() => setShareShown(false)}>
+            <div className = "modal-inner" onClick={(e) => e.stopPropagation()}>
+              <h2>"{note.title}" successfully shared with {userInput}</h2>
+            </div>
+        </div>
       );
     }
     if(shareFailure){
       return (
-        <p>sharing failed.</p>
+        <div className= "modal" onClick={() => setShareShown(false)}>
+            <div className = "modal-inner" onClick={(e) => e.stopPropagation()}>
+              <h2>Sharing failed. </h2>
+            </div>
+        </div>
       );
     }
     return (
