@@ -12,7 +12,23 @@
 .email-input:hover{
     border-color: #ddd;
 }
-
+.close-btn{
+    background-color: transparent;
+    border: none;
+    justify-self: right;
+}
+.close-btn:hover {
+    color: #555;
+}
+.close-btn:focus,
+.close-btn:focus-visible {
+    outline: none;
+}
+.header-cont{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 .cont{
     padding-top: 20px;
 }

@@ -29,7 +29,7 @@ function Flashcards({ note }: { note: Note }) {
   }
   function prevCard() {
     if (flashcards === null) return;
-    setCurrentIndex((currentIndex) => (currentIndex - 1) % flashcards.length);
+    setCurrentIndex((currentIndex) => (currentIndex - 1 + flashcards.length) % flashcards.length);
   }
 
   const toggleFlip = () => {

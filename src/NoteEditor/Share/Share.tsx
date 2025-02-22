@@ -2,6 +2,7 @@ import Note from '../../lib/Note';
 import getAuthToken from '../../services/getAuthToken';
 import { useState } from 'react';
 import './Share.css'
+import CloseIcon from '@mui/icons-material/Close';
 
 function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boolean) => void }) {
     const [userInput, setUserInput] = useState ('');
@@ -39,7 +40,10 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
       return (
         <div className= "modal" onClick={() => setShareShown(false)}>
             <div className = "modal-inner" onClick={(e) => e.stopPropagation()}>
-              <h2>"{note.title}" successfully shared with {userInput}</h2>
+              <div className = "header-cont">
+                <h2>"{note.title}" successfully shared with {userInput}</h2>
+                <button className = "close-btn" onClick={() => setShareShown(false)}><CloseIcon/></button>
+              </div>            
             </div>
         </div>
       );
@@ -48,7 +52,10 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
       return (
         <div className= "modal" onClick={() => setShareShown(false)}>
             <div className = "modal-inner" onClick={(e) => e.stopPropagation()}>
-              <h2>Sharing failed. </h2>
+              <div className = "header-cont">
+                <h2>Sharing failed. </h2>
+                <button className = "close-btn" onClick={() => setShareShown(false)}><CloseIcon/></button> 
+              </div>
             </div>
         </div>
       );
@@ -56,9 +63,12 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
     return (
         <div className= "modal" onClick={() => setShareShown(false)}>
             <div className = "modal-inner" onClick={(e) => e.stopPropagation()}>
+              <div className = "header-cont">
                 <h2>
                 Share "{note.title}"
                 </h2>
+                <button className = "close-btn" onClick={() => setShareShown(false)}><CloseIcon/></button>
+              </div>
                 <input
                     type="text" 
                     placeholder="Enter email address..." 
