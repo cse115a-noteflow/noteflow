@@ -162,6 +162,22 @@ function TextBlock({ note, block }: { note: Note; block: TextBlockType }) {
   const [_, forceUpdate] = useState(0);
   const ranges = getRangesByText(block.value, block.style.formatting);
   const ref = useRef<HTMLDivElement>(null);
+  const [isEditable, setisEditable] = useState(false)
+
+  useEffect(() => {
+    async function checkPermissions() {
+      
+      const userId = note.api.user?.uid
+      if (!userId) return false;
+      if (note.owner != userId && note.permissions?.[userId] != "edit" && !note.permissions?.global?.includes("edit")) {
+      
+        setisEditable(false)
+      } else {
+        setisEditable(true)
+      }
+    }
+    checkPermissions();
+  }, [note]);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -172,18 +188,20 @@ function TextBlock({ note, block }: { note: Note; block: TextBlockType }) {
             forceUpdate((prev) => prev + 1);
             break;
           case 'focus':
-            setCaretPosition(
-              ref.current as HTMLDivElement,
-              Math.min(Math.max(0, params.start ?? Infinity), block.value.length),
-              Math.min(Math.max(0, params.end ?? params.start ?? Infinity), block.value.length)
-            );
+            if(isEditable){
+              setCaretPosition(
+                ref.current as HTMLDivElement,
+                Math.min(Math.max(0, params.start ?? Infinity), block.value.length),
+                Math.min(Math.max(0, params.end ?? params.start ?? Infinity), block.value.length)
+              );
+            }
             break;
         }
       }
     };
     note.addListener(fn);
     return () => note.removeListener(fn);
-  }, [note, block]);
+  }, [note, block, isEditable]);
 
   const setPositionAfterRerender = (start: number, end: number) => {
     if (ref.current) setCaretPosition(ref.current, start, end);
@@ -223,6 +241,10 @@ function TextBlock({ note, block }: { note: Note; block: TextBlockType }) {
   }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (!isEditable) {
+      event.preventDefault();
+      return;
+    }
     if (!ref.current) {
       event.preventDefault();
       return;
@@ -293,6 +315,10 @@ function TextBlock({ note, block }: { note: Note; block: TextBlockType }) {
   }
 
   function handleClick(event: React.MouseEvent<HTMLDivElement>) {
+    if (!isEditable) {
+      event.preventDefault();
+      return;
+    }
     if (!ref.current) return;
     const position = getCaretPosition(event.currentTarget as HTMLDivElement) || [0, 0];
     console.log(position, block.value.slice(position[0], position[1]));
@@ -304,7 +330,7 @@ function TextBlock({ note, block }: { note: Note; block: TextBlockType }) {
       className={
         'block block-text ' + (note.content.length === 1 && block.value === '' ? 'initial' : '')
       }
-      contentEditable
+      contentEditable={isEditable}
       suppressContentEditableWarning
       onKeyDown={handleKeyDown}
       onClick={handleClick}
