@@ -69,7 +69,7 @@ class Note extends EventEmitter {
       this.owner = api.user?.uid ?? '';
       this.permissions = {
         global: null,
-        user: {}
+        user: null
       };
     }
     this.api = api;
@@ -92,14 +92,28 @@ class Note extends EventEmitter {
     return result;
   }
 
-  setTitle(newTitle: string) {
+  async setTitle(newTitle: string) {
+    const userId = this.api.user?.uid
+    if (!userId) return false;
+    if (this.owner != userId && this.permissions?.[userId] != "edit" && !this.permissions?.global?.includes("edit")) {
+      
+      alert("You do not have permission to edit this note.");
+      return;
+    }
     this.title = newTitle || 'Unnamed Note';
     this.emit();
   }
 
   /* Adding content */
 
-  addTextBlock(start = false, value = '') {
+  async addTextBlock(start = false, value = '') {
+    const userId = this.api.user?.uid
+    if (!userId) return false;
+    if (this.owner != userId && this.permissions?.[userId] != "edit" && !this.permissions?.global?.includes("edit")) {
+      
+      alert("You do not have permission to edit this note.");
+      return;
+    }
     const newBlock: TextBlock = {
       ...JSON.parse(JSON.stringify(DEFAULT_TEXT_BLOCK)),
       id: v4(),
@@ -114,7 +128,14 @@ class Note extends EventEmitter {
     return newBlock;
   }
 
-  addTextBlockAfter(block: Block) {
+  async addTextBlockAfter(block: Block) {
+    const userId = this.api.user?.uid
+    if (!userId) return false;
+    if (this.owner != userId && this.permissions?.[userId] != "edit" && !this.permissions?.global?.includes("edit")) {
+      
+      alert("You do not have permission to edit this note.");
+      return;
+    }
     const index = this.content.indexOf(block);
     if (index === -1) return this.addTextBlock();
     const newBlock: TextBlock = {
@@ -126,7 +147,14 @@ class Note extends EventEmitter {
     return newBlock;
   }
 
-  addScribbleBlock() {
+  async addScribbleBlock() {
+    const userId = this.api.user?.uid
+    if (!userId) return false;
+    if (this.owner != userId && this.permissions?.[userId] != "edit" && !this.permissions?.global?.includes("edit")) {
+      
+      alert("You do not have permission to edit this note.");
+      return;
+    }
     const newBlock: ScribbleBlock = {
       ...JSON.parse(JSON.stringify(DEFAULT_SCRIBBLE_BLOCK)),
       id: v4()
@@ -136,7 +164,14 @@ class Note extends EventEmitter {
     return newBlock;
   }
 
-  addMediaBlock(contentUrl: string, contentType: string, width: number, height: number) {
+  async addMediaBlock(contentUrl: string, contentType: string, width: number, height: number) {
+    const userId = this.api.user?.uid
+    if (!userId) return false;
+    if (this.owner != userId && this.permissions?.[userId] != "edit" && !this.permissions?.global?.includes("edit")) {
+      
+      alert("You do not have permission to edit this note.");
+      return;
+    }
     const newBlock: MediaBlock = {
       id: Math.random().toString(36).slice(2),
       type: 'media',
@@ -152,7 +187,14 @@ class Note extends EventEmitter {
     return newBlock;
   }
 
-  deleteBlock(block: Block) {
+  async deleteBlock(block: Block) {
+    const userId = this.api.user?.uid
+    if (!userId) return false;
+    if (this.owner != userId && this.permissions?.[userId] != "edit" && !this.permissions?.global?.includes("edit")) {
+      
+      alert("You do not have permission to edit this note.");
+      return;
+    }
     const index = this.content.indexOf(block);
     if (index === -1) return;
     this.content.splice(index, 1);
