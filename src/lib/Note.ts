@@ -8,9 +8,11 @@ import {
   Permissions,
   ScribbleBlock,
   SerializedNote,
-  TextBlock
+  TextBlock,
+  TextRange
 } from './types';
 import { v4 } from 'uuid';
+import { Delta } from 'quill';
 
 const DEFAULT_TEXT_BLOCK = {
   id: '',
@@ -102,66 +104,69 @@ class Note extends EventEmitter {
     this.emit();
   }
 
-  /* Adding content */
+  /* Quill handlers */
 
-  addTextBlock(start = false, value = '') {
-    const newBlock: TextBlock = {
-      ...JSON.parse(JSON.stringify(DEFAULT_TEXT_BLOCK)),
-      id: v4(),
-      value
-    };
-    if (start) {
-      this.content.unshift(newBlock);
-    } else {
-      this.content.push(newBlock);
+  /**
+   * Maps Quill .getContents() to blocks.
+   * @param content Quill content
+   */
+  export(content: Delta) {
+    // get text from content
+    let text = '';
+    for (const op of content.ops) {
+      if (typeof op.insert === 'string') {
+        text += op.insert;
+      }
     }
+
+    // compose blocks
+    const blocks: Block[] = [
+      {
+        id: '1',
+        type: 'text',
+        position: null,
+        value: text,
+        delta: { ops: content.ops }
+      }
+      // Scribble layer
+    ];
+
+    this.content = blocks;
     this.emit();
-    return newBlock;
+
+    return blocks;
   }
 
-  addTextBlockAfter(block: Block) {
-    const index = this.content.indexOf(block);
-    if (index === -1) return this.addTextBlock();
-    const newBlock: TextBlock = {
-      ...JSON.parse(JSON.stringify(DEFAULT_TEXT_BLOCK)),
-      id: v4()
-    };
-    this.content.splice(index + 1, 0, newBlock);
-    this.emit();
-    return newBlock;
+  /**
+   * Returns a Quill Delta object from the content.
+   */
+  import(note?: SerializedNote): Delta {
+    if (!note) {
+      return this.importBlocks(this.content);
+    }
+
+    // update note
+    if (note.id !== this.id) {
+      throw new Error('Note ID mismatch');
+    }
+    this.title = note.title;
+    this.description = note.description;
+    this.owner = note.owner;
+    this.permissions = note.permissions;
+    return this.importBlocks(note.content);
   }
 
-  addScribbleBlock() {
-    const newBlock: ScribbleBlock = {
-      ...JSON.parse(JSON.stringify(DEFAULT_SCRIBBLE_BLOCK)),
-      id: v4()
-    };
-    this.content.push(newBlock);
+  importBlocks(blocks: Block[]): Delta {
+    this.content = blocks;
     this.emit();
-    return newBlock;
-  }
 
-  addMediaBlock(contentUrl: string, contentType: string, width: number, height: number) {
-    const newBlock: MediaBlock = {
-      id: Math.random().toString(36).slice(2),
-      type: 'media',
-      position: null,
-      value: '',
-      contentType,
-      contentUrl,
-      width,
-      height
-    };
-    this.content.push(newBlock);
-    this.emit();
-    return newBlock;
-  }
-
-  deleteBlock(block: Block) {
-    const index = this.content.indexOf(block);
-    if (index === -1) return;
-    this.content.splice(index, 1);
-    this.emit();
+    // return delta
+    const text = this.content.find((x) => x.type === 'text');
+    const delta = new Delta();
+    if (text && text.delta) {
+      delta.ops = text.delta.ops;
+    }
+    return delta;
   }
 
   /* Saving content */

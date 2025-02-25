@@ -6,6 +6,7 @@ import Quill from 'quill';
 import QuillEditor from './QuillEditor';
 import { throttle } from 'lodash';
 import { getDoc, onSnapshot, setDoc } from 'firebase/firestore';
+import { SerializedNote } from '../../lib/types';
 
 function Editor({
   note,
@@ -30,9 +31,9 @@ function Editor({
   // Save content to Firestore with throttle
   const saveContent = throttle(() => {
     if (quill && isLocalChange.current && note.documentRef) {
-      const content = quill.getContents();
+      const content = note.export(quill.getContents());
       console.log('Saving content to Firestore:', content);
-      setDoc(note.documentRef, { content: content.ops }, { merge: true })
+      setDoc(note.documentRef, { content }, { merge: true })
         .then(() => console.log('Content saved successfully'))
         .catch(console.error);
       isLocalChange.current = false; // Reset local change flag after saving
@@ -45,7 +46,7 @@ function Editor({
       getDoc(note.documentRef)
         .then((docSnap) => {
           if (docSnap.exists()) {
-            const savedContent = docSnap.data().content;
+            const savedContent = note.import(docSnap.data() as SerializedNote);
             if (savedContent) {
               quill.setContents(savedContent);
             }
@@ -58,7 +59,7 @@ function Editor({
       // Listen for Firestore document updates in real-time
       const unsubscribe = onSnapshot(note.documentRef, (snapshot) => {
         if (snapshot.exists()) {
-          const newContent = snapshot.data().content;
+          const newContent = note.import(snapshot.data() as SerializedNote);
 
           if (!isEditing) {
             const currentCursorPosition = quill.getSelection()?.index || 0; // Get the current cursor position
@@ -89,7 +90,9 @@ function Editor({
         quill.off('text-change');
       };
     }
-  }, []);
+  }, [quill, note.documentRef]);
+
+  console.log(note.import());
 
   return (
     <main>
@@ -99,7 +102,7 @@ function Editor({
         setStudyShown={setStudyShown}
         toggleSidebarCollapsed={toggleSidebarCollapsed}
       />
-      <QuillEditor ref={quillRef} />
+      <QuillEditor defaultValue={note.import()} ref={quillRef} />
     </main>
   );
 }

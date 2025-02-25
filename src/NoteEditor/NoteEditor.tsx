@@ -18,11 +18,8 @@ function NoteEditor({ api }: { api: API }) {
       api.getNote(id).then(setNote).catch(console.error);
     } else if (id === null && note === null) {
       setNote(new Note(null, api));
-      setTimeout(() => {
-        // Focus first note block
-        const block = document.querySelector('.note-editor .block.block-text');
-        if (block) (block as HTMLElement).focus();
-      }, 0);
+    } else if (id === null && note && note.id !== null) {
+      setNote(new Note(null, api));
     }
   }, [id]);
 

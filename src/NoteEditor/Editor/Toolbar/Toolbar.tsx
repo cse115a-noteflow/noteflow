@@ -33,7 +33,6 @@ function Toolbar({
   const [align, setAlign] = useState<'left' | 'center' | 'right'>('left');
 
   useEffect(() => {
-    console.log(quill);
     if (quill) {
       const updateFormats = () => {
         const formats = quill.getFormat();
@@ -46,10 +45,11 @@ function Toolbar({
         }
       };
       quill.on('editor-change', updateFormats);
-      document.body.addEventListener('keydown', () => updateFormats());
+      quill.container.addEventListener('keydown', updateFormats);
+
       return () => {
         quill.off('editor-change', updateFormats);
-        document.body.removeEventListener('keydown', () => updateFormats());
+        quill.container.removeEventListener('keydown', updateFormats);
       };
     }
   }, [quill]);
@@ -87,7 +87,7 @@ function Toolbar({
       }
       */
       // local for now
-      note.addMediaBlock(URL.createObjectURL(file), file.type, 0, 0);
+      quill?.insertEmbed(quill.getSelection()?.index ?? 0, 'image', URL.createObjectURL(file));
       input.remove();
     };
   }
