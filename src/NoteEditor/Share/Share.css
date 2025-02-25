@@ -8,6 +8,7 @@
     transition: border-color 0.3s ease;
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     width: 60%;
+    resize: none;
 }
 .email-input:hover{
     border-color: #ddd;

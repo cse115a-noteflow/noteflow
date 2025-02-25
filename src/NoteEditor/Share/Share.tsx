@@ -9,31 +9,35 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
     const [shareSuccess, setShareSuccess] = useState (false);
     const [shareFailure, setShareFailure] = useState (false);
     async function shareNote() {
-        const recipientEmail = userInput;
-        if (!recipientEmail) return;
-    
-        try {
-          const authToken = await getAuthToken(); // Implement this function to get the Firebase token
-          const response = await fetch(`http://localhost:5000/notes/${note.id}/share`, {
-            method: "POST",
-            headers: {
-              "Authorization": `Bearer ${authToken}`,
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ email: recipientEmail, permission: "editor" })
-          });
-    
-          const result = await response.json();
-          if (response.ok) {
-            setShareSuccess(true);
-          } else {
-            setShareFailure(true);
-            // alert(`Error: ${result.error}`);
+        const recipientEmails = userInput.split('\n');
+        if (!recipientEmails) return;
+        const authToken = await getAuthToken();
+        for await (const recipientEmail of recipientEmails) {
+          try{
+            const response = await fetch(`http://localhost:5000/notes/${note.id}/share`, {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${authToken}`,
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ email: recipientEmail, permission: "editor" })
+            });
+      
+            const result = await response.json();
+            if (response.ok) {
+              // console.log("success");
+              setShareSuccess(true);
+            } else {
+              // console.log("error");
+              setShareFailure(true);
+              // alert(`Error: ${result.error}`);
+            }
           }
-        } catch (error) {
-          setShareFailure(true);
-          // console.error("Error sharing note:", error);
-          // alert("An unexpected error occurred.");
+          catch (error) {
+              setShareFailure(true);
+              // console.error("Error sharing note:", error);
+              // alert("An unexpected error occurred.");
+            }
         }
       }
     if(shareSuccess){
@@ -56,6 +60,7 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
                 <h2>Sharing failed. </h2>
                 <button className = "close-btn" onClick={() => setShareShown(false)}><CloseIcon/></button> 
               </div>
+              <p>Please check spelling and try again.</p>
             </div>
         </div>
       );
@@ -69,13 +74,12 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
                 </h2>
                 <button className = "close-btn" onClick={() => setShareShown(false)}><CloseIcon/></button>
               </div>
-                <input
-                    type="text" 
-                    placeholder="Enter email address..." 
+                <textarea
+                    placeholder="Enter email addresses..." 
                     required
                     onChange={(e) => setUserInput(e.target.value)}
                     className = "email-input">
-                </input>
+                </textarea>
                 <div className="cont">
                   <button id="submitBtn" onClick = {shareNote}>
                       Submit
