@@ -1,18 +1,10 @@
 import { doc, DocumentReference } from 'firebase/firestore';
 import API from './API';
 import EventEmitter from './EventEmitter';
-import {
-  Block,
-  FlashCard,
-  MediaBlock,
-  Permissions,
-  ScribbleBlock,
-  SerializedNote,
-  TextBlock,
-  TextRange
-} from './types';
+import { Block, FlashCard, MediaBlock, Permissions, ScribbleBlock, SerializedNote } from './types';
 import { v4 } from 'uuid';
 import { Delta } from 'quill';
+import { getDownloadURL, ref, StorageReference, uploadBytes } from 'firebase/storage';
 
 const DEFAULT_TEXT_BLOCK = {
   id: '',
@@ -167,6 +159,17 @@ class Note extends EventEmitter {
       delta.ops = text.delta.ops;
     }
     return delta;
+  }
+
+  async uploadMedia(file: File): Promise<string | null> {
+    const storageRef = ref(this.api.storage, `notes/${this.id}/${file.name}`);
+    const snapshot = await uploadBytes(storageRef, file, {
+      cacheControl: 'public,max-age=31536000'
+    });
+    console.log(snapshot.metadata);
+    if (!snapshot) return null;
+
+    return await getDownloadURL(storageRef);
   }
 
   /* Saving content */

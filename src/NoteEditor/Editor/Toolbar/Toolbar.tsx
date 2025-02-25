@@ -65,29 +65,21 @@ function Toolbar({
     setTimeout(() => note.emit('focus', { id: newBlock.id }), 0);
   }
 
-  async function addMedia() {
+  function addMedia() {
+    if (!quill) return;
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = 'image/*, video/*';
+    input.accept = 'image/*';
     input.click();
     input.onchange = async () => {
       const file = input.files?.[0];
-      if (!file) return;
-      /*
-      const formData = new FormData();
-      formData.append('file', file);
-      const response = await api.uploadMedia(formData);
-      if (response.success) {
-        note.addMediaBlock(
-          api.getMediaURL(response.id),
-          response.type,
-          response.width,
-          response.height
-        );
+      if (!file || !note || !quill) return;
+      const response = await note.uploadMedia(file);
+      if (response !== null) {
+        quill.insertEmbed(quill.getSelection()?.index ?? 0, 'image', response);
+      } else {
+        alert('Failed to upload media. Try again later.');
       }
-      */
-      // local for now
-      quill?.insertEmbed(quill.getSelection()?.index ?? 0, 'image', URL.createObjectURL(file));
       input.remove();
     };
   }
