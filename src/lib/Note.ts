@@ -1,3 +1,4 @@
+import { doc, DocumentReference } from 'firebase/firestore';
 import API from './API';
 import EventEmitter from './EventEmitter';
 import {
@@ -40,6 +41,8 @@ class Note extends EventEmitter {
   owner: string;
   permissions: Permissions;
   api: API;
+  // Firestore
+  documentRef: DocumentReference | null;
 
   constructor(note: SerializedNote | null, api: API) {
     super();
@@ -50,6 +53,7 @@ class Note extends EventEmitter {
       this.content = note.content;
       this.owner = note.owner;
       this.permissions = note.permissions;
+      this.documentRef = doc(api.firestore, 'notes', this.id);
     } else {
       this.id = '';
       this.title = 'Unnamed Note';
@@ -71,6 +75,7 @@ class Note extends EventEmitter {
         global: null,
         user: {}
       };
+      this.documentRef = null;
     }
     this.api = api;
   }
@@ -175,8 +180,6 @@ class Note extends EventEmitter {
     this.emit();
   }
 
-
-
   /* AI Integrations */
   async search(query: string) {
     return await this.api.search(this.id, query);
@@ -190,7 +193,5 @@ class Note extends EventEmitter {
     return await this.api.generateFlashcards(this.id);
   }
 }
-
-
 
 export default Note;
