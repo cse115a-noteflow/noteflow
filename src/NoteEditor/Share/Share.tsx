@@ -8,6 +8,8 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
     const [userInput, setUserInput] = useState ('');
     const [shareSuccess, setShareSuccess] = useState (false);
     const [shareFailure, setShareFailure] = useState (false);
+    const successfulShares: string[] = [];
+    const unsuccessfulShares: string[] = [];
     async function shareNote() {
         const recipientEmails = userInput.split('\n');
         if (!recipientEmails) return;
@@ -25,19 +27,24 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
       
             const result = await response.json();
             if (response.ok) {
-              // console.log("success");
-              setShareSuccess(true);
+              successfulShares.push(recipientEmail);
             } else {
-              // console.log("error");
-              setShareFailure(true);
+              unsuccessfulShares.push(recipientEmail);
               // alert(`Error: ${result.error}`);
             }
           }
           catch (error) {
-              setShareFailure(true);
+              unsuccessfulShares.push(recipientEmail);
+              // setShareFailure(true);
               // console.error("Error sharing note:", error);
               // alert("An unexpected error occurred.");
             }
+        }
+        if(unsuccessfulShares.length > 0){
+          setShareFailure(true);
+        }
+        else{
+          setShareSuccess(true);
         }
       }
     if(shareSuccess){
@@ -57,9 +64,14 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
         <div className= "modal" onClick={() => setShareShown(false)}>
             <div className = "modal-inner" onClick={(e) => e.stopPropagation()}>
               <div className = "header-cont">
-                <h2>Sharing failed. </h2>
+                <h2>Sharing Failed </h2>
                 <button className = "close-btn" onClick={() => setShareShown(false)}><CloseIcon/></button> 
               </div>
+              <p>Sharing failed with the following emails: </p>
+              <ul>
+              {unsuccessfulShares.map((email) => (<li>{email}</li>))}
+              </ul>
+              <p>{unsuccessfulShares}</p>
               <p>Please check spelling and try again.</p>
             </div>
         </div>
