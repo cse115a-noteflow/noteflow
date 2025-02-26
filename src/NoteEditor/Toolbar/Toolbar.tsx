@@ -46,18 +46,32 @@ function Toolbar({ note, setStudyShown }: { note: Note; setStudyShown: (value: b
   }
 
   async function shareNote() {
-    const recipientEmail = prompt("Enter the email of the user you want to share this note with:");
+    const userId = note.api.user?.uid;
+    if (!userId) return false;
+    if (
+      note.owner != userId &&
+      note.permissions?.[userId] != 'edit' &&
+      !note.permissions?.global?.includes('edit')
+    ) {
+      alert('You do not have permission to edit this note.');
+      return;
+    }
+    const recipientEmail = prompt('Enter the email of the user you want to share this note with:');
     if (!recipientEmail) return;
+
+    const permission = confirm('Click OK to share as an EDITOR, or Cancel to share as a VIEWER')
+      ? 'edit'
+      : 'view';
 
     try {
       const authToken = await getAuthToken(); // Implement this function to get the Firebase token
       const response = await fetch(`http://localhost:5000/notes/${note.id}/share`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Authorization": `Bearer ${authToken}`,
-          "Content-Type": "application/json"
+          Authorization: `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ email: recipientEmail, permission: "editor" })
+        body: JSON.stringify({ email: recipientEmail, permission })
       });
 
       const result = await response.json();
@@ -67,8 +81,8 @@ function Toolbar({ note, setStudyShown }: { note: Note; setStudyShown: (value: b
         alert(`Error: ${result.error}`);
       }
     } catch (error) {
-      console.error("Error sharing note:", error);
-      alert("An unexpected error occurred.");
+      console.error('Error sharing note:', error);
+      alert('An unexpected error occurred.');
     }
   }
 
