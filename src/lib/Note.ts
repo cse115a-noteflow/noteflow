@@ -93,11 +93,14 @@ class Note extends EventEmitter {
   }
 
   async setTitle(newTitle: string) {
-    const userId = this.api.user?.uid
+    const userId = this.api.user?.uid;
     if (!userId) return false;
-    if (this.owner != userId && this.permissions?.[userId] != "edit" && !this.permissions?.global?.includes("edit")) {
-      
-      alert("You do not have permission to edit this note.");
+    if (
+      this.owner != userId &&
+      this.permissions?.[userId] != 'edit' &&
+      !this.permissions?.global?.includes('edit')
+    ) {
+      alert('You do not have permission to edit this note.');
       return;
     }
     this.title = newTitle || 'Unnamed Note';
@@ -107,11 +110,14 @@ class Note extends EventEmitter {
   /* Adding content */
 
   async addTextBlock(start = false, value = '') {
-    const userId = this.api.user?.uid
+    const userId = this.api.user?.uid;
     if (!userId) return false;
-    if (this.owner != userId && this.permissions?.[userId] != "edit" && !this.permissions?.global?.includes("edit")) {
-      
-      alert("You do not have permission to edit this note.");
+    if (
+      this.owner != userId &&
+      this.permissions?.[userId] != 'edit' &&
+      !this.permissions?.global?.includes('edit')
+    ) {
+      alert('You do not have permission to edit this note.');
       return;
     }
     const newBlock: TextBlock = {
@@ -129,11 +135,14 @@ class Note extends EventEmitter {
   }
 
   async addTextBlockAfter(block: Block) {
-    const userId = this.api.user?.uid
+    const userId = this.api.user?.uid;
     if (!userId) return false;
-    if (this.owner != userId && this.permissions?.[userId] != "edit" && !this.permissions?.global?.includes("edit")) {
-      
-      alert("You do not have permission to edit this note.");
+    if (
+      this.owner != userId &&
+      this.permissions?.[userId] != 'edit' &&
+      !this.permissions?.global?.includes('edit')
+    ) {
+      alert('You do not have permission to edit this note.');
       return;
     }
     const index = this.content.indexOf(block);
@@ -148,11 +157,14 @@ class Note extends EventEmitter {
   }
 
   async addScribbleBlock() {
-    const userId = this.api.user?.uid
+    const userId = this.api.user?.uid;
     if (!userId) return false;
-    if (this.owner != userId && this.permissions?.[userId] != "edit" && !this.permissions?.global?.includes("edit")) {
-      
-      alert("You do not have permission to edit this note.");
+    if (
+      this.owner != userId &&
+      this.permissions?.[userId] != 'edit' &&
+      !this.permissions?.global?.includes('edit')
+    ) {
+      alert('You do not have permission to edit this note.');
       return;
     }
     const newBlock: ScribbleBlock = {
@@ -165,11 +177,14 @@ class Note extends EventEmitter {
   }
 
   async addMediaBlock(contentUrl: string, contentType: string, width: number, height: number) {
-    const userId = this.api.user?.uid
+    const userId = this.api.user?.uid;
     if (!userId) return false;
-    if (this.owner != userId && this.permissions?.[userId] != "edit" && !this.permissions?.global?.includes("edit")) {
-      
-      alert("You do not have permission to edit this note.");
+    if (
+      this.owner != userId &&
+      this.permissions?.[userId] != 'edit' &&
+      !this.permissions?.global?.includes('edit')
+    ) {
+      alert('You do not have permission to edit this note.');
       return;
     }
     const newBlock: MediaBlock = {
@@ -188,11 +203,14 @@ class Note extends EventEmitter {
   }
 
   async deleteBlock(block: Block) {
-    const userId = this.api.user?.uid
+    const userId = this.api.user?.uid;
     if (!userId) return false;
-    if (this.owner != userId && this.permissions?.[userId] != "edit" && !this.permissions?.global?.includes("edit")) {
-      
-      alert("You do not have permission to edit this note.");
+    if (
+      this.owner != userId &&
+      this.permissions?.[userId] != 'edit' &&
+      !this.permissions?.global?.includes('edit')
+    ) {
+      alert('You do not have permission to edit this note.');
       return;
     }
     const index = this.content.indexOf(block);
@@ -217,8 +235,6 @@ class Note extends EventEmitter {
     this.emit();
   }
 
-
-
   /* AI Integrations */
   async search(query: string) {
     return await this.api.search(this.id, query);
@@ -232,7 +248,5 @@ class Note extends EventEmitter {
     return await this.api.generateFlashcards(this.id);
   }
 }
-
-
 
 export default Note;

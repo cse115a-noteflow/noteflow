@@ -3,9 +3,7 @@ import Note from './Note';
 import { FailureResponse, PartialNote, SerializedNote } from './types';
 import axios from 'axios';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { updateDoc } from "firebase/firestore"
 import { NotePermissionState } from './types';
-
 
 export const DEFAULT_DATA: SerializedNote = {
   id: '1',
@@ -200,15 +198,17 @@ class API {
       if (response[0] !== 200) return null;
       note.id = response[1].id;
     } else {
-
-      const userId = note.api.user?.uid
+      const userId = note.api.user?.uid;
       if (!userId) return null;
-      if (note.owner != userId && note.permissions?.[userId] != "edit" && !note.permissions?.global?.includes("edit")) {
-      
-        alert("You do not have permission to edit this note.");
+      if (
+        note.owner != userId &&
+        note.permissions?.[userId] != 'edit' &&
+        !note.permissions?.global?.includes('edit')
+      ) {
+        alert('You do not have permission to edit this note.');
         return null;
       }
-      
+
       // PUT - update existing note
       const response = await this.PUT(`/notes/${note.id}`, note.serialize());
       if (response[0] !== 200) return null;
@@ -231,8 +231,6 @@ class API {
   getMediaURL(id: string) {
     return ENDPOINT + '/media/' + id;
   }
-
-  
 
   // AI
   async searchNotes(query: string): Promise<SerializedNote[]> {
@@ -260,29 +258,29 @@ class API {
   /* Permissions */
   async hasPermission(noteId: string, permission: NotePermissionState): Promise<boolean> {
     const userId = this.user?.uid;
-    
+
     if (!userId) return false;
-  
+
     try {
       const note = await this.getNoteById(noteId);
       if (!note) return true;
-  
+
       // Owners always have full permissions
       if (note.owner === userId) return true;
-  
+
       // Check global permission first
       if (note.permissions?.global?.includes(permission)) {
         return true;
       }
-  
+
       // Check user-specific permission
-      if (note.permissions?.[userId] == (permission)) {
+      if (note.permissions?.[userId] == permission) {
         return true;
       }
-      
+
       return false;
     } catch (error) {
-      console.error("Error checking permissions:", error);
+      console.error('Error checking permissions:', error);
       return false;
     }
   }
@@ -293,7 +291,7 @@ class API {
       if (status !== 200 || !data) return null;
       return data as PartialNote;
     } catch (error) {
-      console.error("Error fetching note:", error);
+      console.error('Error fetching note:', error);
       return null;
     }
   }
