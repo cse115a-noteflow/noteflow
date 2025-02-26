@@ -162,18 +162,20 @@ function TextBlock({ note, block }: { note: Note; block: TextBlockType }) {
   const [_, forceUpdate] = useState(0);
   const ranges = getRangesByText(block.value, block.style.formatting);
   const ref = useRef<HTMLDivElement>(null);
-  const [isEditable, setisEditable] = useState(false)
+  const [isEditable, setisEditable] = useState(false);
 
   useEffect(() => {
     async function checkPermissions() {
-      
-      const userId = note.api.user?.uid
+      const userId = note.api.user?.uid;
       if (!userId) return false;
-      if (note.owner != userId && note.permissions?.[userId] != "edit" && !note.permissions?.global?.includes("edit")) {
-      
-        setisEditable(false)
+      if (
+        note.owner != userId &&
+        note.permissions?.[userId] != 'edit' &&
+        !note.permissions?.global?.includes('edit')
+      ) {
+        setisEditable(false);
       } else {
-        setisEditable(true)
+        setisEditable(true);
       }
     }
     checkPermissions();
@@ -188,7 +190,7 @@ function TextBlock({ note, block }: { note: Note; block: TextBlockType }) {
             forceUpdate((prev) => prev + 1);
             break;
           case 'focus':
-            if(isEditable){
+            if (isEditable) {
               setCaretPosition(
                 ref.current as HTMLDivElement,
                 Math.min(Math.max(0, params.start ?? Infinity), block.value.length),
