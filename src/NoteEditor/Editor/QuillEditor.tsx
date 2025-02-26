@@ -58,14 +58,14 @@ function _QuillEditor(
     const quill = new Quill(editorContainer, {
       theme: 'snow',
       modules: {
-        toolbar: [
+        toolbar: false /*[
           [{ header: [1, 2, 3, 4, 5, 6, false] }],
           ['bold', 'italic', 'underline', 'strike'],
           [{ list: 'ordered' }, { list: 'bullet' }],
           [{ align: [] }],
           ['link', 'image'],
           ['clean']
-        ]
+        ]*/
       }
     });
 

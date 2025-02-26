@@ -1,21 +1,10 @@
-import {
-  Add,
-  Edit,
-  Menu,
-  TextFields,
-  FormatBold,
-  FormatItalic,
-  FormatStrikethrough,
-  FormatUnderlined,
-  FormatAlignLeft,
-  FormatAlignCenter,
-  FormatAlignRight
-} from '@mui/icons-material';
+import { Add, Edit, Menu } from '@mui/icons-material';
 import Note from '../../../lib/Note';
 import './Toolbar.css';
 import { useEffect, useState } from 'react';
 import getAuthToken from '../../../services/getAuthToken';
 import Quill from 'quill';
+import TextToolbar from './TextToolbar/TextToolbar';
 
 function Toolbar({
   note,
@@ -29,40 +18,11 @@ function Toolbar({
   toggleSidebarCollapsed: () => void;
 }) {
   const [isSaving, setIsSaving] = useState(false);
-  const [activeFormats, setActiveFormats] = useState<string[]>([]);
-  const [align, setAlign] = useState<'left' | 'center' | 'right'>('left');
-
-  useEffect(() => {
-    if (quill) {
-      const updateFormats = () => {
-        const formats = quill.getFormat();
-        console.log(quill.getContents());
-        setActiveFormats(Object.keys(formats));
-        if (formats.align) {
-          setAlign(formats.align as 'left' | 'center' | 'right');
-        } else {
-          setAlign('left');
-        }
-      };
-      quill.on('editor-change', updateFormats);
-      quill.container.addEventListener('keydown', updateFormats);
-
-      return () => {
-        quill.off('editor-change', updateFormats);
-        quill.container.removeEventListener('keydown', updateFormats);
-      };
-    }
-  }, [quill]);
 
   async function save() {
     setIsSaving(true);
     await note.save();
     setIsSaving(false);
-  }
-
-  function addText() {
-    const newBlock = note.addTextBlock();
-    setTimeout(() => note.emit('focus', { id: newBlock.id }), 0);
   }
 
   function addMedia() {
@@ -111,30 +71,6 @@ function Toolbar({
     }
   }
 
-  function toggleFormat(format: string) {
-    if (quill) {
-      const range = quill.getSelection();
-      const formats = quill.getFormat(range ?? undefined);
-      if (formats[format]) {
-        quill.format(format, false);
-        setActiveFormats(activeFormats.filter((f) => f !== format));
-      } else {
-        quill.format(format, true);
-        setActiveFormats([...activeFormats, format]);
-      }
-    }
-  }
-
-  function justify(align: 'left' | 'center' | 'right') {
-    if (quill) {
-      if (align === 'left') {
-        quill.format('align', false);
-      } else {
-        quill.format('align', align);
-      }
-    }
-  }
-
   return (
     <div className="toolbar">
       <button className="transparentBtn" onClick={toggleSidebarCollapsed}>
@@ -142,57 +78,7 @@ function Toolbar({
       </button>
       <hr />
       <p>{note.documentRef ? 'Connected' : 'Disconnected'}</p>
-      <div className="tools text">
-        <button onClick={addText}>
-          <TextFields />
-        </button>
-        <div className="group">
-          <button
-            onClick={() => toggleFormat('bold')}
-            className={'format ' + (activeFormats.includes('bold') ? 'active' : '')}
-          >
-            <FormatBold />
-          </button>
-          <button
-            onClick={() => toggleFormat('italic')}
-            className={'format ' + (activeFormats.includes('italic') ? 'active' : '')}
-          >
-            <FormatItalic />
-          </button>
-          <button
-            onClick={() => toggleFormat('underline')}
-            className={'format ' + (activeFormats.includes('underline') ? 'active' : '')}
-          >
-            <FormatUnderlined />
-          </button>
-          <button
-            onClick={() => toggleFormat('strike')}
-            className={'format ' + (activeFormats.includes('strike') ? 'active' : '')}
-          >
-            <FormatStrikethrough />
-          </button>
-        </div>
-        <div className="group">
-          <button
-            onClick={() => justify('left')}
-            className={'format ' + (align === 'left' ? 'active' : '')}
-          >
-            <FormatAlignLeft />
-          </button>
-          <button
-            onClick={() => justify('center')}
-            className={'format ' + (align === 'center' ? 'active' : '')}
-          >
-            <FormatAlignCenter />
-          </button>
-          <button
-            onClick={() => justify('right')}
-            className={'format ' + (align === 'right' ? 'active' : '')}
-          >
-            <FormatAlignRight />
-          </button>
-        </div>
-      </div>
+      {quill && <TextToolbar quill={quill} />}
       <div className="tools scribble">
         <button onClick={() => note.addScribbleBlock()}>
           <Edit />
