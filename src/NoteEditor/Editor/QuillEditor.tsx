@@ -1,5 +1,6 @@
 import React, { forwardRef, useEffect, useLayoutEffect, useRef } from 'react';
-import Quill from 'quill';
+import Quill, { Delta, Op } from 'quill';
+// @ts-expect-error QuillMarkdown is not typed
 import QuillMarkdown from 'quilljs-markdown';
 import 'quill/dist/quill.snow.css';
 import 'quilljs-markdown/dist/quilljs-markdown-common-style.css';
@@ -15,15 +16,15 @@ function _QuillEditor(
     onTextChange,
     onSelectionChange
   }: {
-    readOnly: boolean;
-    defaultValue: unknown;
-    onTextChange: (...args: unknown[]) => void;
-    onSelectionChange: (...args: unknown[]) => void;
+    readOnly?: boolean;
+    defaultValue?: Delta | Op[];
+    onTextChange?: (...args: unknown[]) => void;
+    onSelectionChange?: (...args: unknown[]) => void;
   },
   ref: React.ForwardedRef<Quill | null>
 ) {
-  const containerRef = useRef<null | HTMLElement>(null);
-  const defaultValueRef = useRef(defaultValue);
+  const containerRef = useRef<null | HTMLDivElement>(null);
+  const defaultValueRef = useRef<Delta | Op[]>(defaultValue ?? []);
   const onTextChangeRef = useRef(onTextChange);
   const onSelectionChangeRef = useRef(onSelectionChange);
 

@@ -64,7 +64,7 @@ function Toolbar({
       <p>{note.documentRef ? 'Connected' : 'Disconnected'}</p>
       {quill && <TextToolbar quill={quill} />}
       <div className="tools scribble">
-        <button onClick={() => note.addScribbleBlock()}>
+        <button>
           <Edit />
         </button>
       </div>

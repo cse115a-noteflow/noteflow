@@ -23,7 +23,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 function App() {
-  const [api, setApi] = useState(new API(app));
+  const [api] = useState(new API(app));
   const [user] = useAuthState(api.auth);
   const [isFirebaseReady, setIsFirebaseReady] = useState(false);
 

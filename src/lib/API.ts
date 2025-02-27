@@ -1,6 +1,6 @@
 import { FirebaseApp } from 'firebase/app';
 import Note from './Note';
-import { FailureResponse, PartialNote, SerializedNote } from './types';
+import { PartialNote, SerializedNote } from './types';
 import axios from 'axios';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { Firestore, getFirestore } from 'firebase/firestore';
@@ -29,15 +29,10 @@ export const DEFAULT_DATA: SerializedNote = {
   }
 };
 
-const ENDPOINT = 'http://localhost:5000';
-
-interface MediaResponse {
-  success: true;
-  id: string;
-  value: string;
-  width: number;
-  height: number;
-}
+const ENDPOINT =
+  process.env.NODE_ENV === 'development'
+    ? 'http://localhost:5000'
+    : 'https://server-212131836065.us-west1.run.app';
 
 /**
  * Tools for interacting with the app's REST API.
@@ -205,7 +200,7 @@ class API {
   async shareNote(
     id: string,
     emails: { [email: string]: 'edit' | 'view' },
-    global: 'edit' | 'view'
+    global: 'edit' | 'view' | null
   ) {
     const response = await this.POST(`/notes/${id}/share`, { user: emails, global });
 

@@ -17,7 +17,7 @@ function TextToolbar({ quill }: { quill: Quill }) {
 
   useEffect(() => {
     if (quill) {
-      const updateFormats = (e) => {
+      const updateFormats = () => {
         if (quill.getSelection() === null) {
           // Not focused - don't call quill methods, as this will refocus the editor
           setActiveFormats([]);
