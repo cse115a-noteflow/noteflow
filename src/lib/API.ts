@@ -182,9 +182,9 @@ class API {
       const userId = note.api.user?.uid;
       if (!userId) return null;
       if (
-        note.owner != userId &&
-        note.permissions?.[userId] != 'edit' &&
-        !note.permissions?.global?.includes('edit')
+        note.owner !== userId &&
+        note.permissions.user[userId]?.permission !== 'edit' &&
+        note.permissions.global !== 'edit'
       ) {
         alert('You do not have permission to edit this note.');
         return null;
@@ -254,12 +254,12 @@ class API {
       if (note.owner === userId) return true;
 
       // Check global permission first
-      if (note.permissions?.global?.includes(permission)) {
+      if (note.permissions.global === permission) {
         return true;
       }
 
       // Check user-specific permission
-      if (note.permissions?.[userId] == permission) {
+      if (note.permissions.user[userId]?.permission === permission) {
         return true;
       }
 

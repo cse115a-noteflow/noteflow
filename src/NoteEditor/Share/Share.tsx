@@ -50,7 +50,7 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
   }
 
   function updatePermission(
-    email: { email: string; permission: 'edit' | 'view' },
+    email: { email: string; name: string; permission: 'edit' | 'view' },
     index: number,
     e: ChangeEvent<HTMLSelectElement>
   ) {

@@ -58,16 +58,13 @@ class Note extends EventEmitter {
           type: 'text',
           position: null,
           value: '',
-          style: {
-            formatting: [],
-            align: 'left'
-          }
+          delta: { ops: [] }
         }
       ];
       this.owner = api.user?.uid ?? '';
       this.permissions = {
         global: null,
-        user: null
+        user: {}
       };
       this.documentRef = null;
     }
@@ -99,9 +96,9 @@ class Note extends EventEmitter {
     const userId = this.api.user?.uid;
     if (!userId) return false;
     if (
-      this.owner != userId &&
-      this.permissions?.[userId]?.permission != 'edit' &&
-      !this.permissions?.global?.includes('edit')
+      this.owner !== userId &&
+      this.permissions.user[userId]?.permission !== 'edit' &&
+      this.permissions.global !== 'edit'
     ) {
       alert('You do not have permission to edit this note.');
       return;
