@@ -182,9 +182,9 @@ class API {
       const userId = note.api.user?.uid;
       if (!userId) return null;
       if (
-        note.owner != userId &&
-        note.permissions?.[userId] != 'edit' &&
-        !note.permissions?.global?.includes('edit')
+        note.owner !== userId &&
+        note.permissions.user[userId]?.permission !== 'edit' &&
+        note.permissions.global !== 'edit'
       ) {
         alert('You do not have permission to edit this note.');
         return null;
@@ -200,6 +200,17 @@ class API {
   async deleteNote(id: string): Promise<boolean> {
     const response = await this.DELETE(`/notes/${id}`);
     return response[0] === 200;
+  }
+
+  async shareNote(
+    id: string,
+    emails: { [email: string]: 'edit' | 'view' },
+    global: 'edit' | 'view'
+  ) {
+    const response = await this.POST(`/notes/${id}/share`, { user: emails, global });
+
+    if (response[0] !== 200) return null;
+    return response[1];
   }
 
   getMediaURL(id: string) {
@@ -235,7 +246,6 @@ class API {
 
     if (!userId) return false;
 
-
     try {
       const note = await this.getNoteById(noteId);
       if (!note) return false;
@@ -244,12 +254,12 @@ class API {
       if (note.owner === userId) return true;
 
       // Check global permission first
-      if (note.permissions?.global?.includes(permission)) {
+      if (note.permissions.global === permission) {
         return true;
       }
 
       // Check user-specific permission
-      if (note.permissions?.[userId] == permission) {
+      if (note.permissions.user[userId]?.permission === permission) {
         return true;
       }
 

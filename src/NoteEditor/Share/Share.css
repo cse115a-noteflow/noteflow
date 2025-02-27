@@ -1,0 +1,84 @@
+.email-input {
+  padding: 8px;
+  font-size: 16px;
+  border: 2px solid #eee;
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.3s ease;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  width: calc(100% - 16px);
+  resize: none;
+}
+.email-input:hover {
+  border-color: #ddd;
+}
+.email-list {
+  border: 1px solid #ddd;
+  height: 200px;
+  background-color: #f0f0f0;
+  overflow-y: auto;
+  border-radius: 5px;
+}
+.email-list:not(:has(.email)) {
+  border-top: none;
+}
+.email {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  gap: 8px;
+  border-bottom: 1px solid #ddd;
+}
+.email-list .email:last-child {
+  border-bottom: none;
+}
+.email > span {
+  flex-grow: 1;
+}
+.email select {
+  padding: 4px 8px;
+  font-size: 16px;
+  height: 100%;
+  border: none;
+  background-color: transparent;
+  outline: none;
+  font-family: unset;
+}
+.close-btn {
+  background-color: transparent;
+  border-color: transparent;
+  padding: 8px;
+}
+.close-btn:hover {
+  background-color: #f9f9f9;
+  border-color: #ddd;
+}
+.close-btn:focus,
+.close-btn:focus-visible,
+.close-btn:active {
+  outline: none;
+  border-color: #aaa;
+  background-color: #ccc;
+}
+.header-cont {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.header-cont h2 {
+  margin: 0;
+}
+.cont {
+  padding-top: 10px;
+}
+.error {
+  color: red;
+  font-size: 14px;
+  margin-top: 4px;
+}
+label {
+  font-size: 16px;
+  font-weight: 500;
+}

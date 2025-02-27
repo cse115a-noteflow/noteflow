@@ -4,6 +4,7 @@ import Note from '../lib/Note';
 import Sidebar from './Sidebar/Sidebar';
 import './NoteEditor.css';
 import Study from './Study/Study';
+import Share from './Share/Share';
 import Editor from './Editor/Editor';
 
 function NoteEditor({ api }: { api: API }) {
@@ -11,6 +12,7 @@ function NoteEditor({ api }: { api: API }) {
   const [id, setId] = useState<string | null>(null);
   const [studyShown, setStudyShown] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [shareShown, setShareShown] = useState(false);
 
   useEffect(() => {
     if (id !== null && note && note.id !== id) {
@@ -27,10 +29,12 @@ function NoteEditor({ api }: { api: API }) {
     <div className="note-editor">
       <Sidebar note={note} setId={setId} api={api} collapsed={sidebarCollapsed} />
       {note !== null && studyShown && <Study note={note} setStudyShown={setStudyShown} />}
+      {note !== null && shareShown && <Share note={note} setShareShown={setShareShown} />}
       {note === null && <div>Loading...</div>}
       {note !== null && (
         <Editor
           note={note}
+          setShareShown={setShareShown}
           setStudyShown={setStudyShown}
           toggleSidebarCollapsed={() => setSidebarCollapsed(!sidebarCollapsed)}
         />
