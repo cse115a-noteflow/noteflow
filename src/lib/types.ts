@@ -4,6 +4,8 @@ interface PartialNote {
   description: string;
   owner: string;
   permissions: Permissions;
+  createdAt?: number; 
+  modifiedAt?: number;
 }
 
 interface SerializedNote extends PartialNote {

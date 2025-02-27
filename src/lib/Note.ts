@@ -39,6 +39,8 @@ class Note extends EventEmitter {
   content: Block[];
   owner: string;
   permissions: Permissions;
+  createdAt?: number;
+  modifiedAt?: number;
   api: API;
 
   constructor(note: SerializedNote | null, api: API) {
@@ -50,6 +52,8 @@ class Note extends EventEmitter {
       this.content = note.content;
       this.owner = note.owner;
       this.permissions = note.permissions;
+      this.createdAt = Date.now();
+      this.modifiedAt = Date.now();
     } else {
       this.id = '';
       this.title = 'Unnamed Note';
@@ -71,6 +75,8 @@ class Note extends EventEmitter {
         global: null,
         user: null
       };
+      this.createdAt = Date.now();
+      this.modifiedAt = Date.now();
     }
     this.api = api;
   }

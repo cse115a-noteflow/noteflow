@@ -9,6 +9,7 @@ function SidebarNotes({ setId, api }: { setId: (id: string | null) => void; api:
   const [notes, setNotes] = useState<PartialNote[] | null>(null);
   const [cursor, setCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [sortOption, setSortOption] = useState<"title"|"created"|"modified">("modified")
 
   async function loadMore() {
     
@@ -36,6 +37,18 @@ function SidebarNotes({ setId, api }: { setId: (id: string | null) => void; api:
     loadMore();
   }, []);
 
+  const sortedNotes = notes
+    ? [...notes].sort((a, b) => {
+        if (sortOption === "title") {
+          return a.title.localeCompare(b.title);
+        } else if (sortOption === "created") {
+          return (a.createdAt || 0) - (b.createdAt || 0);
+        } else {
+          return (b.modifiedAt || 0) - (a.modifiedAt || 0);
+        }
+      })
+    : [];
+
   return (
     <div className="note-cards">
       <div className="note-filters">
@@ -43,6 +56,11 @@ function SidebarNotes({ setId, api }: { setId: (id: string | null) => void; api:
           <input type="text" placeholder="Search notes" />
           <Search />
         </div>
+        <select value={sortOption} onChange={(e) => setSortOption(e.target.value as "title" | "created" | "modified")}>
+          <option value="modified">Last Modified</option>
+          <option value="created">Creation Date</option>
+          <option value="title">Title</option>
+        </select>
         <button style={{ flexGrow: 0 }}>
           <FilterAltOutlined />
         </button>
@@ -54,7 +72,7 @@ function SidebarNotes({ setId, api }: { setId: (id: string | null) => void; api:
         {(notes === null || loading) && <div>Loading...</div>}
         {notes !== null &&
           !loading &&
-          notes.map((note) => (
+          sortedNotes.map((note) => (
             <div
               key={note.id}
               className={`note-card ${note.id === (note?.id || null) ? 'selected' : ''}`}
