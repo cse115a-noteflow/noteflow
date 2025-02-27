@@ -12,6 +12,7 @@ function SidebarNotes({ setId, api }: { setId: (id: string | null) => void; api:
   const [cursor, setCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   // Load more notes from API
   async function loadMore() {
@@ -40,6 +41,7 @@ function SidebarNotes({ setId, api }: { setId: (id: string | null) => void; api:
 
   // Filter notes based on searchQuery
   useEffect(() => {
+    /*
     if (!searchQuery) {
       setFilteredNotes(notes); // Reset to all notes if search is empty
     } else {
@@ -47,7 +49,23 @@ function SidebarNotes({ setId, api }: { setId: (id: string | null) => void; api:
         note.title.toLowerCase().includes(searchQuery.toLowerCase())
       ));
     }
-  }, [searchQuery, notes]);
+    */
+    let sortedNotes = [...notes];
+
+    if (searchQuery) {
+      sortedNotes = sortedNotes.filter((note) =>
+        note.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+  
+    sortedNotes.sort((a, b) => 
+      sortOrder === 'asc' 
+        ? a.title.localeCompare(b.title) 
+        : b.title.localeCompare(a.title)
+    );
+  
+    setFilteredNotes(sortedNotes);
+  }, [searchQuery, notes, sortOrder]);
 
   // Initial load
   useEffect(() => {
@@ -66,7 +84,8 @@ function SidebarNotes({ setId, api }: { setId: (id: string | null) => void; api:
           />
           <Search />
         </div>
-        <button style={{ flexGrow: 0 }}>
+        <button style={{ flexGrow: 0 }}
+          onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}>
           <FilterAltOutlined />
         </button>
         <button style={{ flexGrow: 0 }} onClick={() => setId(null)}>
