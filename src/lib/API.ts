@@ -179,6 +179,17 @@ class API {
       if (response[0] !== 200) return null;
       note.id = response[1].id;
     } else {
+      const userId = note.api.user?.uid;
+      if (!userId) return null;
+      if (
+        note.owner != userId &&
+        note.permissions?.[userId] != 'edit' &&
+        !note.permissions?.global?.includes('edit')
+      ) {
+        alert('You do not have permission to edit this note.');
+        return null;
+      }
+
       // PUT - update existing note
       const response = await this.PUT(`/notes/${note.id}`, note.serialize());
       if (response[0] !== 200) return null;
@@ -221,7 +232,9 @@ class API {
   /* Permissions */
   async hasPermission(noteId: string, permission: NotePermissionState): Promise<boolean> {
     const userId = this.user?.uid;
+
     if (!userId) return false;
+
 
     try {
       const note = await this.getNoteById(noteId);

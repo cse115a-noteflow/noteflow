@@ -67,7 +67,7 @@ class Note extends EventEmitter {
       this.owner = api.user?.uid ?? '';
       this.permissions = {
         global: null,
-        user: {}
+        user: null
       };
       this.documentRef = null;
     }
@@ -91,7 +91,17 @@ class Note extends EventEmitter {
     return result;
   }
 
-  setTitle(newTitle: string) {
+  async setTitle(newTitle: string) {
+    const userId = this.api.user?.uid;
+    if (!userId) return false;
+    if (
+      this.owner != userId &&
+      this.permissions?.[userId] != 'edit' &&
+      !this.permissions?.global?.includes('edit')
+    ) {
+      alert('You do not have permission to edit this note.');
+      return;
+    }
     this.title = newTitle || 'Unnamed Note';
     this.emit();
   }
