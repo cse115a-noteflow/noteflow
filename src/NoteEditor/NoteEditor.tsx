@@ -4,7 +4,8 @@ import Note from '../lib/Note';
 import Sidebar from './Sidebar/Sidebar';
 import './NoteEditor.css';
 import Study from './Study/Study';
-import Share from './Share/Share'
+import Share from './Share/Share';
+import Editor from './Editor/Editor';
 
 function NoteEditor({ api }: { api: API }) {
   const [note, setNote] = useState<null | Note>(null);
@@ -33,6 +34,7 @@ function NoteEditor({ api }: { api: API }) {
       {note !== null && (
         <Editor
           note={note}
+          setShareShown={setShareShown}
           setStudyShown={setStudyShown}
           toggleSidebarCollapsed={() => setSidebarCollapsed(!sidebarCollapsed)}
         />

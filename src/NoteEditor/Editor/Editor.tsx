@@ -11,10 +11,12 @@ import { SerializedNote } from '../../lib/types';
 function Editor({
   note,
   setStudyShown,
+  setShareShown,
   toggleSidebarCollapsed
 }: {
   note: Note;
   setStudyShown: (value: boolean) => void;
+  setShareShown: (value: boolean) => void;
   toggleSidebarCollapsed: () => void;
 }) {
   // Need to use useCallback here so that we know when the Ref is updated
@@ -100,6 +102,7 @@ function Editor({
         note={note}
         quill={quill}
         setStudyShown={setStudyShown}
+        setShareShown={setShareShown}
         toggleSidebarCollapsed={toggleSidebarCollapsed}
       />
       <QuillEditor defaultValue={note.import()} ref={quillRef} />
