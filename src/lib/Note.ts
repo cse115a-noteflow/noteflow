@@ -1,31 +1,10 @@
 import { doc, DocumentReference } from 'firebase/firestore';
 import API from './API';
 import EventEmitter from './EventEmitter';
-import { Block, FlashCard, MediaBlock, Permissions, ScribbleBlock, SerializedNote } from './types';
+import { Block, FlashCard, Permissions, SerializedNote } from './types';
 import { v4 } from 'uuid';
 import { Delta } from 'quill';
-import { getDownloadURL, ref, StorageReference, uploadBytes } from 'firebase/storage';
-
-const DEFAULT_TEXT_BLOCK = {
-  id: '',
-  type: 'text',
-  position: null,
-  value: '',
-  style: {
-    formatting: [],
-    align: 'left'
-  }
-};
-
-const DEFAULT_SCRIBBLE_BLOCK = {
-  id: '',
-  type: 'scribble',
-  position: null,
-  value: '',
-  width: 0,
-  height: 0,
-  strokes: []
-};
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
 class Note extends EventEmitter {
   id: string;
@@ -195,7 +174,7 @@ class Note extends EventEmitter {
     return content.join('\n');
   }
 
-  blockUpdate(block: Block) {
+  blockUpdate() {
     this.emit();
   }
 
