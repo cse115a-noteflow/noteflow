@@ -3,9 +3,9 @@ import Note from './Note';
 import { FailureResponse, PartialNote, SerializedNote } from './types';
 import axios from 'axios';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { updateDoc } from "firebase/firestore"
+import { Firestore, getFirestore } from 'firebase/firestore';
+import { getStorage, type FirebaseStorage } from 'firebase/storage';
 import { NotePermissionState } from './types';
-
 
 export const DEFAULT_DATA: SerializedNote = {
   id: '1',
@@ -17,34 +17,8 @@ export const DEFAULT_DATA: SerializedNote = {
       type: 'text',
       position: null,
       value: 'This is a sample note. Look, we can have formatting and everything!',
-      style: {
-        formatting: [
-          {
-            start: 0,
-            end: 4,
-            color: 'red',
-            highlight: '',
-            link: null,
-            types: ['bold']
-          },
-          {
-            start: 5,
-            end: 7,
-            color: 'blue',
-            highlight: '',
-            link: null,
-            types: ['italic']
-          },
-          {
-            start: 23,
-            end: 35,
-            color: 'green',
-            highlight: 'brown',
-            link: 'https://example.com',
-            types: ['underline']
-          }
-        ],
-        align: 'left'
+      delta: {
+        ops: [{ insert: 'This is a sample note. Look, we can have formatting and everything!\n' }]
       }
     }
   ],
@@ -71,8 +45,13 @@ interface MediaResponse {
  */
 class API {
   app: FirebaseApp;
+  firestore: Firestore;
+  storage: FirebaseStorage;
+
   constructor(app: FirebaseApp) {
     this.app = app;
+    this.firestore = getFirestore(app);
+    this.storage = getStorage(app);
   }
 
   private async POST(path: string, data: unknown, headers?: object) {
@@ -200,6 +179,17 @@ class API {
       if (response[0] !== 200) return null;
       note.id = response[1].id;
     } else {
+      const userId = note.api.user?.uid;
+      if (!userId) return null;
+      if (
+        note.owner != userId &&
+        note.permissions?.[userId] != 'edit' &&
+        !note.permissions?.global?.includes('edit')
+      ) {
+        alert('You do not have permission to edit this note.');
+        return null;
+      }
+
       // PUT - update existing note
       const response = await this.PUT(`/notes/${note.id}`, note.serialize());
       if (response[0] !== 200) return null;
@@ -212,18 +202,9 @@ class API {
     return response[0] === 200;
   }
 
-  async uploadMedia(formData: FormData): Promise<MediaResponse | FailureResponse> {
-    const response = await this.POST('/media', formData);
-    return response[1] !== null
-      ? response[1]
-      : { success: false, message: 'Failed to upload media' };
-  }
-
   getMediaURL(id: string) {
     return ENDPOINT + '/media/' + id;
   }
-
-  
 
   // AI
   async searchNotes(query: string): Promise<SerializedNote[]> {
@@ -251,28 +232,30 @@ class API {
   /* Permissions */
   async hasPermission(noteId: string, permission: NotePermissionState): Promise<boolean> {
     const userId = this.user?.uid;
+
     if (!userId) return false;
-  
+
+
     try {
       const note = await this.getNoteById(noteId);
       if (!note) return false;
-  
+
       // Owners always have full permissions
       if (note.owner === userId) return true;
-  
+
       // Check global permission first
       if (note.permissions?.global?.includes(permission)) {
         return true;
       }
-  
+
       // Check user-specific permission
-      if (note.permissions?.[userId] == (permission)) {
+      if (note.permissions?.[userId] == permission) {
         return true;
       }
-  
+
       return false;
     } catch (error) {
-      console.error("Error checking permissions:", error);
+      console.error('Error checking permissions:', error);
       return false;
     }
   }
@@ -283,7 +266,7 @@ class API {
       if (status !== 200 || !data) return null;
       return data as PartialNote;
     } catch (error) {
-      console.error("Error fetching note:", error);
+      console.error('Error fetching note:', error);
       return null;
     }
   }
