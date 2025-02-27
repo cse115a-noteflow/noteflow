@@ -91,12 +91,16 @@ class Note extends EventEmitter {
     return result;
   }
 
+  async share(emails: { [email: string]: 'edit' | 'view' }, global: 'edit' | 'view' | null) {
+    return await this.api.shareNote(this.id, emails, global);
+  }
+
   async setTitle(newTitle: string) {
     const userId = this.api.user?.uid;
     if (!userId) return false;
     if (
       this.owner != userId &&
-      this.permissions?.[userId] != 'edit' &&
+      this.permissions?.[userId]?.permission != 'edit' &&
       !this.permissions?.global?.includes('edit')
     ) {
       alert('You do not have permission to edit this note.');

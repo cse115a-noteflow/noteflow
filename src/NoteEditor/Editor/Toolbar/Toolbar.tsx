@@ -1,7 +1,7 @@
 import { Add, Edit, Menu } from '@mui/icons-material';
 import Note from '../../../lib/Note';
 import './Toolbar.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Quill from 'quill';
 import TextToolbar from './TextToolbar/TextToolbar';
 
@@ -19,12 +19,22 @@ function Toolbar({
   toggleSidebarCollapsed: () => void;
 }) {
   const [isSaving, setIsSaving] = useState(false);
+  const [isSharable, setIsSharable] = useState(false);
 
   async function save() {
     setIsSaving(true);
     await note.save();
     setIsSaving(false);
+    setIsSharable(true);
   }
+
+  useEffect(() => {
+    if (note.id) {
+      setIsSharable(true);
+    } else {
+      setIsSharable(false);
+    }
+  }, [note.id]);
 
   function addMedia() {
     if (!quill) return;
@@ -65,7 +75,7 @@ function Toolbar({
       </div>
       <div style={{ flexGrow: '1' }} />
       <div className="tools-share">
-        <button onClick={() => setShareShown(true)}>Share</button>
+        {isSharable && <button onClick={() => setShareShown(true)}>Share</button>}
         <button onClick={() => setStudyShown(true)}>Study</button>
         <button onClick={save} disabled={isSaving}>
           Save

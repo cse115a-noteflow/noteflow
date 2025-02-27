@@ -21,7 +21,9 @@ type NotePermissionState = 'view' | 'edit';
 
 interface Permissions {
   global: NotePermissionState | null;
-  [userId: string]: NotePermissionState | null;
+  user: {
+    [userId: string]: { permission: NotePermissionState; name: string };
+  };
 }
 
 interface Position {

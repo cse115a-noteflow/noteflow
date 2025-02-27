@@ -202,6 +202,17 @@ class API {
     return response[0] === 200;
   }
 
+  async shareNote(
+    id: string,
+    emails: { [email: string]: 'edit' | 'view' },
+    global: 'edit' | 'view'
+  ) {
+    const response = await this.POST(`/notes/${id}/share`, { user: emails, global });
+
+    if (response[0] !== 200) return null;
+    return response[1];
+  }
+
   getMediaURL(id: string) {
     return ENDPOINT + '/media/' + id;
   }
@@ -234,7 +245,6 @@ class API {
     const userId = this.user?.uid;
 
     if (!userId) return false;
-
 
     try {
       const note = await this.getNoteById(noteId);

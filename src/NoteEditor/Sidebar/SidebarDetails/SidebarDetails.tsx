@@ -12,7 +12,7 @@ import '../Sidebar.css';
 import { useEffect, useState } from 'react';
 
 function SidebarDetails({ note }: { note: Note }) {
-  let length = 18;
+  const length = 18;
   const [_, forceUpdate] = useState(0);
   const [editing, setEditing] = useState(false);
   const [draftName, setDraftName] = useState(note.title);
@@ -48,7 +48,7 @@ function SidebarDetails({ note }: { note: Note }) {
 
   function truncateTitle(str: string, limit: number): string {
     if (str.length > limit) {
-        return str.substring(0, limit) + '...';
+      return str.substring(0, limit) + '...';
     }
     return str;
   }
@@ -83,7 +83,9 @@ function SidebarDetails({ note }: { note: Note }) {
       <div className="sidebar-header">
         <DescriptionOutlined fontSize="large" />
         <div className="text">
-          {!editing && <h2 onClick={() => setEditing(true)}>{truncateTitle(note.title, length)}</h2>}
+          {!editing && (
+            <h2 onClick={() => setEditing(true)}>{truncateTitle(note.title, length)}</h2>
+          )}
           {editing && (
             <input
               className="title"
