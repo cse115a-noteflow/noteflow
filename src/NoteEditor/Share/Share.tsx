@@ -8,8 +8,10 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
     const [userInput, setUserInput] = useState ('');
     const [shareSuccess, setShareSuccess] = useState (false);
     const [shareFailure, setShareFailure] = useState (false);
-    const successfulShares: string[] = [];
-    const unsuccessfulShares: string[] = [];
+    const successes:string[]  = [];
+    const failures:string[]  = [];
+    const [successfulShares, setSuccessfulShares] =  useState(successes);
+    const [unsuccessfulShares, setUnsuccessfulShares] =  useState(failures);
     async function shareNote() {
         const recipientEmails = userInput.split('\n');
         if (!recipientEmails) return;
@@ -27,20 +29,18 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
       
             const result = await response.json();
             if (response.ok) {
-              successfulShares.push(recipientEmail);
+              successes.push(recipientEmail);
             } else {
-              unsuccessfulShares.push(recipientEmail);
-              // alert(`Error: ${result.error}`);
+              failures.push(recipientEmail);
             }
           }
           catch (error) {
-              unsuccessfulShares.push(recipientEmail);
-              // setShareFailure(true);
-              // console.error("Error sharing note:", error);
-              // alert("An unexpected error occurred.");
+              failures.push(recipientEmail);
             }
         }
-        if(unsuccessfulShares.length > 0){
+        setSuccessfulShares(successes);
+        setUnsuccessfulShares(failures);
+        if(failures.length > 0){
           setShareFailure(true);
         }
         else{
@@ -51,10 +51,11 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
       return (
         <div className= "modal" onClick={() => setShareShown(false)}>
             <div className = "modal-inner" onClick={(e) => e.stopPropagation()}>
-              <div className = "header-cont">
-                <h2>"{note.title}" successfully shared with {userInput}</h2>
-                <button className = "close-btn" onClick={() => setShareShown(false)}><CloseIcon/></button>
-              </div>            
+              <button className = "close-btn" onClick={() => setShareShown(false)}><CloseIcon/></button>
+              <h2>"{note.title}" successfully shared with: </h2>
+              <ul>
+              {successfulShares.map((email) => (<li>{email}</li>))}
+              </ul>        
             </div>
         </div>
       );
@@ -63,15 +64,12 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
       return (
         <div className= "modal" onClick={() => setShareShown(false)}>
             <div className = "modal-inner" onClick={(e) => e.stopPropagation()}>
-              <div className = "header-cont">
-                <h2>Sharing Failed </h2>
-                <button className = "close-btn" onClick={() => setShareShown(false)}><CloseIcon/></button> 
-              </div>
+              <button className = "close-btn" onClick={() => setShareShown(false)}><CloseIcon/></button> 
+              <h2>Sharing Failed </h2>
               <p>Sharing failed with the following emails: </p>
               <ul>
               {unsuccessfulShares.map((email) => (<li>{email}</li>))}
               </ul>
-              <p>{unsuccessfulShares}</p>
               <p>Please check spelling and try again.</p>
             </div>
         </div>
