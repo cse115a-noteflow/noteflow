@@ -3,6 +3,8 @@ import Note from './Note';
 import { FailureResponse, PartialNote, SerializedNote } from './types';
 import axios from 'axios';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { Firestore, getFirestore } from 'firebase/firestore';
+import { getStorage, type FirebaseStorage } from 'firebase/storage';
 import { NotePermissionState } from './types';
 
 export const DEFAULT_DATA: SerializedNote = {
@@ -15,41 +17,15 @@ export const DEFAULT_DATA: SerializedNote = {
       type: 'text',
       position: null,
       value: 'This is a sample note. Look, we can have formatting and everything!',
-      style: {
-        formatting: [
-          {
-            start: 0,
-            end: 4,
-            color: 'red',
-            highlight: '',
-            link: null,
-            types: ['bold']
-          },
-          {
-            start: 5,
-            end: 7,
-            color: 'blue',
-            highlight: '',
-            link: null,
-            types: ['italic']
-          },
-          {
-            start: 23,
-            end: 35,
-            color: 'green',
-            highlight: 'brown',
-            link: 'https://example.com',
-            types: ['underline']
-          }
-        ],
-        align: 'left'
+      delta: {
+        ops: [{ insert: 'This is a sample note. Look, we can have formatting and everything!\n' }]
       }
     }
   ],
   owner: '1',
   permissions: {
     global: 'edit',
-    user: null
+    user: {}
   }
 };
 
@@ -69,8 +45,13 @@ interface MediaResponse {
  */
 class API {
   app: FirebaseApp;
+  firestore: Firestore;
+  storage: FirebaseStorage;
+
   constructor(app: FirebaseApp) {
     this.app = app;
+    this.firestore = getFirestore(app);
+    this.storage = getStorage(app);
   }
 
   private async POST(path: string, data: unknown, headers?: object) {
@@ -221,13 +202,6 @@ class API {
     return response[0] === 200;
   }
 
-  async uploadMedia(formData: FormData): Promise<MediaResponse | FailureResponse> {
-    const response = await this.POST('/media', formData);
-    return response[1] !== null
-      ? response[1]
-      : { success: false, message: 'Failed to upload media' };
-  }
-
   getMediaURL(id: string) {
     return ENDPOINT + '/media/' + id;
   }
@@ -261,9 +235,10 @@ class API {
 
     if (!userId) return false;
 
+
     try {
       const note = await this.getNoteById(noteId);
-      if (!note) return true;
+      if (!note) return false;
 
       // Owners always have full permissions
       if (note.owner === userId) return true;

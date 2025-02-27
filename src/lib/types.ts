@@ -1,3 +1,5 @@
+import { Delta } from 'quill';
+
 interface PartialNote {
   id: string;
   title: string;
@@ -28,26 +30,12 @@ interface Position {
   zIndex: number;
 }
 
-type Format = 'bold' | 'italic' | 'underline' | 'strikethrough' | 'code' | 'math';
-
-interface TextRange {
-  start: number;
-  end: number;
-  color: string;
-  highlight: string;
-  link: string | null;
-  types: Format[];
-}
-
 interface TextBlock {
   id: string;
   type: 'text';
   position: Position | null;
   value: string;
-  style: {
-    formatting: TextRange[];
-    align: 'left' | 'center' | 'right';
-  };
+  delta: { ops: Delta['ops'] };
 }
 
 interface Stroke {
@@ -112,8 +100,6 @@ export type {
   Permissions,
   NotePermissionState,
   Position,
-  Format,
-  TextRange,
   TextBlock,
   Stroke,
   ScribbleBlock,

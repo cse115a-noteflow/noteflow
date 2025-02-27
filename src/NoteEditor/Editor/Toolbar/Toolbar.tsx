@@ -1,10 +1,22 @@
-import { Add, Edit, Menu, TextFields } from '@mui/icons-material';
-import Note from '../../lib/Note';
+import { Add, Edit, Menu } from '@mui/icons-material';
+import Note from '../../../lib/Note';
 import './Toolbar.css';
-import { useState } from 'react';
-import getAuthToken from '../../services/getAuthToken';
+import { useEffect, useState } from 'react';
+import getAuthToken from '../../../services/getAuthToken';
+import Quill from 'quill';
+import TextToolbar from './TextToolbar/TextToolbar';
 
-function Toolbar({ note, setStudyShown }: { note: Note; setStudyShown: (value: boolean) => void }) {
+function Toolbar({
+  note,
+  quill,
+  setStudyShown,
+  toggleSidebarCollapsed
+}: {
+  note: Note;
+  quill: Quill | null;
+  setStudyShown: (value: boolean) => void;
+  toggleSidebarCollapsed: () => void;
+}) {
   const [isSaving, setIsSaving] = useState(false);
 
   async function save() {
@@ -13,34 +25,21 @@ function Toolbar({ note, setStudyShown }: { note: Note; setStudyShown: (value: b
     setIsSaving(false);
   }
 
-  function addText() {
-    const newBlock = note.addTextBlock();
-    setTimeout(() => note.emit('focus', { id: newBlock.id }), 0);
-  }
-
-  async function addMedia() {
+  function addMedia() {
+    if (!quill) return;
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = 'image/*, video/*';
+    input.accept = 'image/*';
     input.click();
     input.onchange = async () => {
       const file = input.files?.[0];
-      if (!file) return;
-      /*
-      const formData = new FormData();
-      formData.append('file', file);
-      const response = await api.uploadMedia(formData);
-      if (response.success) {
-        note.addMediaBlock(
-          api.getMediaURL(response.id),
-          response.type,
-          response.width,
-          response.height
-        );
+      if (!file || !note || !quill) return;
+      const response = await note.uploadMedia(file);
+      if (response !== null) {
+        quill.insertEmbed(quill.getSelection()?.index ?? 0, 'image', response);
+      } else {
+        alert('Failed to upload media. Try again later.');
       }
-      */
-      // local for now
-      note.addMediaBlock(URL.createObjectURL(file), file.type, 0, 0);
       input.remove();
     };
   }
@@ -88,21 +87,18 @@ function Toolbar({ note, setStudyShown }: { note: Note; setStudyShown: (value: b
 
   return (
     <div className="toolbar">
-      <button className="transparentBtn">
+      <button className="transparentBtn" onClick={toggleSidebarCollapsed}>
         <Menu />
       </button>
       <hr />
-      <div className="tools-text">
-        <button onClick={addText}>
-          <TextFields />
-        </button>
-      </div>
-      <div className="tools-scribble">
+      <p>{note.documentRef ? 'Connected' : 'Disconnected'}</p>
+      {quill && <TextToolbar quill={quill} />}
+      <div className="tools scribble">
         <button onClick={() => note.addScribbleBlock()}>
           <Edit />
         </button>
       </div>
-      <div className="tools-media">
+      <div className="tools media">
         <button onClick={addMedia}>
           <Add />
         </button>
