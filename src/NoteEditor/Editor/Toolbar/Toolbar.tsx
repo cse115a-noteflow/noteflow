@@ -1,4 +1,4 @@
-import { Add, Edit, Menu } from '@mui/icons-material';
+import { Add, Edit, Menu, Wifi, WifiOff } from '@mui/icons-material';
 import Note from '../../../lib/Note';
 import './Toolbar.css';
 import { useEffect, useState } from 'react';
@@ -8,13 +8,11 @@ import TextToolbar from './TextToolbar/TextToolbar';
 function Toolbar({
   note,
   quill,
-  setStudyShown,
   setShareShown,
   toggleSidebarCollapsed
 }: {
   note: Note;
   quill: Quill | null;
-  setStudyShown: (value: boolean) => void;
   setShareShown: (value: boolean) => void;
   toggleSidebarCollapsed: () => void;
 }) {
@@ -22,14 +20,16 @@ function Toolbar({
   const [isSharable, setIsSharable] = useState(false);
 
   async function save() {
+    if (!quill) return;
     setIsSaving(true);
+    note.export(quill.getContents());
     await note.save();
     setIsSaving(false);
     setIsSharable(true);
   }
 
   useEffect(() => {
-    if (note.id) {
+    if (note.owner === note.api.user?.uid) {
       setIsSharable(true);
     } else {
       setIsSharable(false);
@@ -61,7 +61,7 @@ function Toolbar({
         <Menu />
       </button>
       <hr />
-      <p>{note.documentRef ? 'Connected' : 'Disconnected'}</p>
+      <p>{note.documentRef ? <Wifi /> : <WifiOff />}</p>
       {quill && <TextToolbar quill={quill} />}
       <div className="tools scribble">
         <button>
@@ -75,8 +75,11 @@ function Toolbar({
       </div>
       <div style={{ flexGrow: '1' }} />
       <div className="tools-share">
-        {isSharable && <button onClick={() => setShareShown(true)}>Share</button>}
-        <button onClick={() => setStudyShown(true)}>Study</button>
+        {isSharable && (
+          <button disabled={!note.documentRef} onClick={() => setShareShown(true)}>
+            Share
+          </button>
+        )}
         <button onClick={save} disabled={isSaving}>
           Save
         </button>

@@ -13,11 +13,13 @@ function _QuillEditor(
   {
     readOnly,
     defaultValue,
+    placeholder,
     onTextChange,
     onSelectionChange
   }: {
     readOnly?: boolean;
     defaultValue?: Delta | Op[];
+    placeholder?: string;
     onTextChange?: (...args: unknown[]) => void;
     onSelectionChange?: (...args: unknown[]) => void;
   },
@@ -58,6 +60,7 @@ function _QuillEditor(
     const editorContainer = container.appendChild(container.ownerDocument.createElement('div'));
     const quill = new Quill(editorContainer, {
       theme: 'snow',
+      placeholder,
       modules: {
         toolbar: false /*[
           [{ header: [1, 2, 3, 4, 5, 6, false] }],
@@ -93,7 +96,7 @@ function _QuillEditor(
     };
   }, [ref]);
 
-  return <div ref={containerRef}></div>;
+  return <div className="ql-wrapper" ref={containerRef}></div>;
 }
 const QuillEditor = forwardRef(_QuillEditor);
 

@@ -3,8 +3,17 @@ import type API from '../../../lib/API';
 import { Search, FilterAltOutlined, Add, DescriptionOutlined } from '@mui/icons-material';
 import { useEffect, useState } from 'react';
 import { PartialNote } from '../../../lib/types';
+import Note from '../../../lib/Note';
 
-function SidebarNotes({ setId, api }: { setId: (id: string | null) => void; api: API }) {
+function SidebarNotes({
+  setId,
+  note,
+  api
+}: {
+  setId: (id: string | null) => void;
+  note: Note | null;
+  api: API;
+}) {
   const [notes, setNotes] = useState<PartialNote[] | null>(null);
   const [cursor, setCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -28,6 +37,8 @@ function SidebarNotes({ setId, api }: { setId: (id: string | null) => void; api:
   }
 
   useEffect(() => {
+    console.log('Loading notes');
+    setNotes(null);
     loadMore();
   }, []);
 
@@ -41,7 +52,11 @@ function SidebarNotes({ setId, api }: { setId: (id: string | null) => void; api:
         <button style={{ flexGrow: 0 }}>
           <FilterAltOutlined />
         </button>
-        <button style={{ flexGrow: 0 }} onClick={() => setId(null)}>
+        <button
+          className={note && note.id === '' ? 'active' : ''}
+          style={{ flexGrow: 0 }}
+          onClick={() => setId(null)}
+        >
           <Add />
         </button>
       </div>

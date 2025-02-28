@@ -1,21 +1,16 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Note from '../../lib/Note';
 import Toolbar from './Toolbar/Toolbar';
 import '../NoteEditor.css';
 import Quill from 'quill';
 import QuillEditor from './QuillEditor';
-import { throttle } from 'lodash';
-import { getDoc, onSnapshot, setDoc } from 'firebase/firestore';
-import { SerializedNote } from '../../lib/types';
 
 function Editor({
   note,
-  setStudyShown,
   setShareShown,
   toggleSidebarCollapsed
 }: {
   note: Note;
-  setStudyShown: (value: boolean) => void;
   setShareShown: (value: boolean) => void;
   toggleSidebarCollapsed: () => void;
 }) {
@@ -25,90 +20,41 @@ function Editor({
     setQuill(quill);
   }, []);
 
-  // Real time features
-  const [isEditing, setIsEditing] = useState(false);
-
-  const isLocalChange = useRef(false);
-
-  // Save content to Firestore with throttle
-  const saveContent = throttle(() => {
-    if (quill && isLocalChange.current && note.documentRef) {
-      const content = note.export(quill.getContents());
-      console.log('Saving content to Firestore:', content);
-      setDoc(note.documentRef, { content }, { merge: true })
-        // Reset local change flag after saving
-        .then(() => {
-          isLocalChange.current = false;
-        })
-        .catch(console.error);
-    }
-  }, 1000);
+  function focusFirstLine() {
+    if (!quill) return;
+    const firstLine = quill.getLines(0, 1);
+    quill.setSelection(Math.max(0, firstLine[0].length() - 1));
+    console.log(firstLine[0]);
+    quill.focus();
+  }
 
   useEffect(() => {
-    if (quill && note.documentRef) {
-      // Load initial content from Firestore
-      getDoc(note.documentRef)
-        .then((docSnap) => {
-          if (docSnap.exists()) {
-            const savedContent = note.import(docSnap.data() as SerializedNote);
-            if (savedContent) {
-              console.log('Document found, loading content:', savedContent);
-              quill.setContents(savedContent);
-            }
-          } else {
-            console.log('No document found, starting with empty editor.');
-          }
-        })
-        .catch(console.error);
-
-      // Listen for Firestore document updates in real-time
-      const unsubscribe = onSnapshot(note.documentRef, (snapshot) => {
-        if (snapshot.exists() && isLocalChange.current === false) {
-          const newContent = note.import(snapshot.data() as SerializedNote);
-
-          if (!isEditing) {
-            const currentCursorPosition = quill.getSelection()?.index || 0; // Get the current cursor position
-
-            // Apply content update silently to avoid triggering `text-change`
-            quill.setContents(newContent, 'silent');
-
-            // Restore cursor position after content update
-            quill.setSelection(currentCursorPosition);
-          }
+    if (quill) {
+      note.quill = quill;
+      note.createSession();
+      note.addListener((type) => {
+        if (type === 'realtime-start') {
+          focusFirstLine();
         }
       });
-
-      // Listen for local text changes and save to Firestore
-      quill.on('text-change', (_delta, _oldDelta, source) => {
-        if (source === 'user') {
-          isLocalChange.current = true; // Mark change as local
-          setIsEditing(true);
-          saveContent();
-
-          // Reset editing state after 5 seconds of inactivity
-          setTimeout(() => setIsEditing(false), 5000);
-        }
-      });
-
-      return () => {
-        unsubscribe();
-        quill.off('text-change');
-      };
+      return () => note.destroySession();
     }
   }, [quill, note.documentRef]);
-
-  console.log(note.import());
 
   return (
     <main>
       <Toolbar
         note={note}
         quill={quill}
-        setStudyShown={setStudyShown}
         setShareShown={setShareShown}
         toggleSidebarCollapsed={toggleSidebarCollapsed}
       />
-      <QuillEditor key={note.id} defaultValue={note.import()} ref={quillRef} />
+      <QuillEditor
+        key={note.id}
+        placeholder="Write something new..."
+        defaultValue={note.import()}
+        ref={quillRef}
+      />
     </main>
   );
 }

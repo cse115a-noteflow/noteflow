@@ -2,20 +2,26 @@ import Note from '../../../lib/Note';
 import {
   DescriptionOutlined,
   Send,
-  ArrowBack,
   Settings,
   School,
   ContentCopy,
-  Close
+  Close,
+  Notes
 } from '@mui/icons-material';
 import '../Sidebar.css';
 import { useEffect, useState } from 'react';
+import { type StudyMode } from '../../Study/Study';
 
-function SidebarDetails({ note }: { note: Note }) {
-  const length = 18;
+function SidebarDetails({
+  note,
+  setStudyMode
+}: {
+  note: Note | null;
+  setStudyMode: (value: StudyMode) => void;
+}) {
   const [_, forceUpdate] = useState(0);
   const [editing, setEditing] = useState(false);
-  const [draftName, setDraftName] = useState(note.title);
+  const [draftName, setDraftName] = useState(note?.title ?? 'Untitled Note');
   // RAG search
   const [isSaved, setIsSaved] = useState(false);
   const [query, setQuery] = useState('');
@@ -28,7 +34,7 @@ function SidebarDetails({ note }: { note: Note }) {
   }
 
   async function search() {
-    if (query && !loadingResult) {
+    if (note && query && !loadingResult) {
       setLoadingResult(true);
       const result = await note.search(query);
       setSearchResult(result);
@@ -46,14 +52,13 @@ function SidebarDetails({ note }: { note: Note }) {
     }
   }
 
-  function truncateTitle(str: string, limit: number): string {
-    if (str.length > limit) {
-      return str.substring(0, limit) + '...';
-    }
-    return str;
-  }
-
   useEffect(() => {
+    if (!note) {
+      // reset ai stuff
+      setLoadingResult(false);
+      setSearchResult(null);
+      return;
+    }
     const update = (type: string) => {
       if (type === 'noteUpdate') {
         forceUpdate((prev) => prev + 1);
@@ -69,6 +74,10 @@ function SidebarDetails({ note }: { note: Note }) {
   }, [note]);
 
   useEffect(() => {
+    setDraftName(note?.title ?? 'Untitled Note');
+  }, [note?.title]);
+
+  useEffect(() => {
     if (editing) {
       const input: HTMLInputElement | null = document.querySelector('.sidebar-details input.title');
       if (input) {
@@ -82,21 +91,22 @@ function SidebarDetails({ note }: { note: Note }) {
     <div className="sidebar-details">
       <div className="sidebar-header">
         <DescriptionOutlined fontSize="large" />
-        <div className="text">
-          {!editing && (
-            <h2 onClick={() => setEditing(true)}>{truncateTitle(note.title, length)}</h2>
-          )}
-          {editing && (
-            <input
-              className="title"
-              defaultValue={draftName}
-              onChange={(e) => setDraftName(e.target.value)}
-              onBlur={submitName}
-              onKeyDown={(e) => e.key === 'Enter' && submitName()}
-            />
-          )}
-          <p>{note.description}</p>
-        </div>
+        {note === null && <div style={{ height: '2em' }} className="skeleton" />}
+        {note !== null && (
+          <div className="text">
+            {!editing && <h2 onClick={() => setEditing(true)}>{note?.title}</h2>}
+            {editing && (
+              <input
+                className="title"
+                defaultValue={draftName}
+                onChange={(e) => setDraftName(e.target.value)}
+                onBlur={submitName}
+                onKeyDown={(e) => e.key === 'Enter' && submitName()}
+              />
+            )}
+            <p>{note ? note.description : ''}</p>
+          </div>
+        )}
       </div>
       <div className="sidebar-actions">
         {(loadingResult || searchResult) && (
@@ -137,7 +147,7 @@ function SidebarDetails({ note }: { note: Note }) {
           </div>
         )}
         {isSaved && (
-          <div className={'search ' + (loadingResult ? 'disabled' : '')}>
+          <div className={'search ' + (loadingResult || note === null ? 'disabled' : '')}>
             <input
               type="text"
               defaultValue={query}
@@ -152,13 +162,21 @@ function SidebarDetails({ note }: { note: Note }) {
         )}
         <div className="btn-row">
           <button>
-            <ArrowBack />
-          </button>
-          <button>
             <Settings />
           </button>
-          <button>
+          <button
+            title="Generate flashcards"
+            onClick={() => setStudyMode('flashcards')}
+            disabled={note === null || !isSaved}
+          >
             <School />
+          </button>
+          <button
+            title="Generate a summary"
+            onClick={() => setStudyMode('summary')}
+            disabled={note === null || !isSaved}
+          >
+            <Notes />
           </button>
         </div>
       </div>

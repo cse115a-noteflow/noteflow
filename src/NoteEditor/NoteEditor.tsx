@@ -3,14 +3,14 @@ import API from '../lib/API';
 import Note from '../lib/Note';
 import Sidebar from './Sidebar/Sidebar';
 import './NoteEditor.css';
-import Study from './Study/Study';
+import Study, { type StudyMode } from './Study/Study';
 import Share from './Share/Share';
 import Editor from './Editor/Editor';
 
 function NoteEditor({ api }: { api: API }) {
   const [note, setNote] = useState<null | Note>(null);
   const [id, setId] = useState<string | null>(null);
-  const [studyShown, setStudyShown] = useState(false);
+  const [studyMode, setStudyMode] = useState<StudyMode>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [shareShown, setShareShown] = useState(false);
 
@@ -27,8 +27,16 @@ function NoteEditor({ api }: { api: API }) {
 
   return (
     <div className="note-editor">
-      <Sidebar note={note} setId={setId} api={api} collapsed={sidebarCollapsed} />
-      {note !== null && studyShown && <Study note={note} setStudyShown={setStudyShown} />}
+      <Sidebar
+        note={note}
+        setStudyMode={setStudyMode}
+        setId={setId}
+        api={api}
+        collapsed={sidebarCollapsed}
+      />
+      {note !== null && studyMode && (
+        <Study note={note} mode={studyMode} setStudyMode={setStudyMode} />
+      )}
       {note !== null && shareShown && <Share note={note} setShareShown={setShareShown} />}
       {note === null && (
         <main>
@@ -40,7 +48,6 @@ function NoteEditor({ api }: { api: API }) {
         <Editor
           note={note}
           setShareShown={setShareShown}
-          setStudyShown={setStudyShown}
           toggleSidebarCollapsed={() => setSidebarCollapsed(!sidebarCollapsed)}
         />
       )}
