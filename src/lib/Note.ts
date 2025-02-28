@@ -1,11 +1,11 @@
-import { doc, DocumentReference, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
+import { doc, DocumentReference, onSnapshot, setDoc } from 'firebase/firestore';
 import API from './API';
 import EventEmitter from './EventEmitter';
 import { Block, FlashCard, Permissions, SerializedNote, SerializedCursor } from './types';
 import { v4 } from 'uuid';
 import Quill, { Delta } from 'quill';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import { isEqual, throttle } from 'lodash';
+import { throttle } from 'lodash';
 import QuillCursors from 'quill-cursors';
 import colorFromUID from './colorFromUID';
 import diffDeltas from './diffDeltas';
@@ -281,9 +281,9 @@ class Note extends EventEmitter {
 
   importBlocks(blocks: Block[], newData = true): Delta {
     const oldText = this.content.find((x) => x.type === 'text');
-    const oldDelta = oldText ? oldText.delta : { ops: [] };
+    const oldDelta = oldText ? new Delta(oldText.delta) : new Delta();
     const newText = blocks.find((x) => x.type === 'text');
-    const newDelta = newText ? newText.delta : { ops: [] };
+    const newDelta = newText ? new Delta(newText.delta) : new Delta();
     this.content = blocks;
     if (newData) {
       this.emit();
