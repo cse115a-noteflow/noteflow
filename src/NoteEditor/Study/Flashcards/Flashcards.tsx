@@ -11,6 +11,7 @@ function Flashcards({ note }: { note: Note }) {
   // you'll need to take that into account.
   const [currentIndex, setCurrentIndex] = useState(0);
   const [flashcards, setFlashcards] = useState<{ term: string; definition: string }[] | null>(null);
+  const [flipped, setFlipped] = useState(false);
   async function generate() {
     const flashcards = await note.generateFlashcards();
     if (flashcards !== null) {
@@ -25,32 +26,53 @@ function Flashcards({ note }: { note: Note }) {
   // card.onclick = function(){card.classList.toggle("flip")}
   function nextCard() {
     if (flashcards === null) return;
+    setFlipped(false);
     setCurrentIndex((currentIndex) => (currentIndex + 1) % flashcards.length);
   }
   function prevCard() {
     if (flashcards === null) return;
+    setFlipped(false);
     setCurrentIndex((currentIndex) => (currentIndex - 1 + flashcards.length) % flashcards.length);
   }
 
   const toggleFlip = () => {
-    const card = document.getElementById('card');
-    if (card) {
-      card.classList.toggle('flip');
-    }
+    setFlipped(!flipped);
   };
 
   if (flashcards === null) {
     return <p>Loading...</p>;
   }
 
+  if (flashcards.length === 0) {
+    return (
+      <div className="flashcards">
+        <div className="card disabled">
+          <div className="front">
+            <h2>Couldn't make any flashcards.</h2>
+            <p>Add more to your note to study it!</p>
+          </div>
+        </div>
+        <div className="nav-content">
+          <button disabled>
+            <ChevronLeft />
+          </button>
+          <h2>0/{flashcards.length}</h2>
+          <button disabled>
+            <ChevronRight />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flashcards">
-      <div className="card" id="card" onClick={toggleFlip}>
+      <div key={currentIndex} className={'card ' + (flipped ? 'flip' : '')} onClick={toggleFlip}>
         <div className="front">
           <h2>{flashcards[currentIndex].term}</h2>
         </div>
         <div className="back">
-          <h2>{flashcards[currentIndex].definition}</h2>
+          <p>{flashcards[currentIndex].definition}</p>
         </div>
       </div>
       <div className="nav-content">

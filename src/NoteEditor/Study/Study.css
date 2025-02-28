@@ -21,10 +21,12 @@
   /*     align-items: center; */
   background-color: #f9f9f9;
   border-radius: 5px;
+  border: 1px solid #ccc;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.2);
   transition: transform 0.6s;
   transform-style: preserve-3d;
   cursor: pointer;
+  text-align: center;
 }
 
 .card.flip {
@@ -34,14 +36,15 @@
 .card .front,
 .card .back {
   position: absolute;
-  width: 80%;
-  height: 80%;
+  width: calc(100% - 40px);
+  height: calc(100% - 40px);
   backface-visibility: hidden;
   border-radius: 5px;
 }
 
 .card .front {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   background-color: #f9f9f9;
@@ -60,4 +63,9 @@
   padding: 20px;
   backface-visibility: hidden;
   position: absolute;
+}
+
+.card.disabled {
+  box-shadow: none;
+  cursor: unset;
 }

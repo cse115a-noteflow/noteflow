@@ -14,7 +14,15 @@ interface SerializedNote extends PartialNote {
   description: string;
   content: Block[];
   owner: string;
+  cursors?: { [uid: string]: SerializedCursor };
   permissions: Permissions;
+}
+
+interface SerializedCursor {
+  name: string;
+  index: number;
+  length: number;
+  updatedAt: number;
 }
 
 type NotePermissionState = 'view' | 'edit';
@@ -99,6 +107,7 @@ interface FlashCard {
 export type {
   PartialNote,
   SerializedNote,
+  SerializedCursor,
   Permissions,
   NotePermissionState,
   Position,
