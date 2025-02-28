@@ -30,7 +30,12 @@ function NoteEditor({ api }: { api: API }) {
       <Sidebar note={note} setId={setId} api={api} collapsed={sidebarCollapsed} />
       {note !== null && studyShown && <Study note={note} setStudyShown={setStudyShown} />}
       {note !== null && shareShown && <Share note={note} setShareShown={setShareShown} />}
-      {note === null && <div>Loading...</div>}
+      {note === null && (
+        <main>
+          <div className="toolbar"></div>
+          <p style={{ marginLeft: 16 }}>Loading...</p>
+        </main>
+      )}
       {note !== null && (
         <Editor
           note={note}

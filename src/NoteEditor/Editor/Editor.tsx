@@ -24,6 +24,7 @@ function Editor({
   const quillRef = useCallback((quill: Quill | null) => {
     setQuill(quill);
   }, []);
+  const [noteContent, setNoteContent] = useState(note.import());
 
   // Real time features
   const [isEditing, setIsEditing] = useState(false);
@@ -36,9 +37,11 @@ function Editor({
       const content = note.export(quill.getContents());
       console.log('Saving content to Firestore:', content);
       setDoc(note.documentRef, { content }, { merge: true })
-        .then(() => console.log('Content saved successfully'))
+        // Reset local change flag after saving
+        .then(() => {
+          isLocalChange.current = false;
+        })
         .catch(console.error);
-      isLocalChange.current = false; // Reset local change flag after saving
     }
   }, 1000);
 
@@ -50,6 +53,7 @@ function Editor({
           if (docSnap.exists()) {
             const savedContent = note.import(docSnap.data() as SerializedNote);
             if (savedContent) {
+              console.log('Document found, loading content:', savedContent);
               quill.setContents(savedContent);
             }
           } else {
@@ -60,7 +64,7 @@ function Editor({
 
       // Listen for Firestore document updates in real-time
       const unsubscribe = onSnapshot(note.documentRef, (snapshot) => {
-        if (snapshot.exists()) {
+        if (snapshot.exists() && isLocalChange.current === false) {
           const newContent = note.import(snapshot.data() as SerializedNote);
 
           if (!isEditing) {
@@ -105,7 +109,7 @@ function Editor({
         setShareShown={setShareShown}
         toggleSidebarCollapsed={toggleSidebarCollapsed}
       />
-      <QuillEditor defaultValue={note.import()} ref={quillRef} />
+      <QuillEditor key={note.id} defaultValue={note.import()} ref={quillRef} />
     </main>
   );
 }

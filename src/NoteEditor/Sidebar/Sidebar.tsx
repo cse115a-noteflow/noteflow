@@ -18,6 +18,7 @@ function Sidebar({
   return (
     <div className="sidebar" style={{ width: collapsed ? '0' : '350px' }}>
       {note && <SidebarDetails note={note} />}
+      {!note && <div className="sidebar-details skeleton" />}
       <SidebarNotes setId={setId} api={api} />
     </div>
   );

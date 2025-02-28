@@ -124,7 +124,7 @@ class Note extends EventEmitter {
    */
   import(note?: SerializedNote): Delta {
     if (!note) {
-      return this.importBlocks(this.content);
+      return this.importBlocks(this.content, false);
     }
 
     // update note
@@ -138,9 +138,9 @@ class Note extends EventEmitter {
     return this.importBlocks(note.content);
   }
 
-  importBlocks(blocks: Block[]): Delta {
+  importBlocks(blocks: Block[], emit = true): Delta {
     this.content = blocks;
-    this.emit();
+    if (emit) this.emit();
 
     // return delta
     const text = this.content.find((x) => x.type === 'text');
