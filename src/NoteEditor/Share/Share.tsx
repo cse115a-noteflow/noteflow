@@ -152,7 +152,10 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
           {draftEmails.map((email, i) => (
             <div key={email.email} className="email">
               <span>{email.name}</span>
-              <select onChange={updatePermission.bind(null, email, i)}>
+              <select
+                defaultValue={email.permission}
+                onChange={updatePermission.bind(null, email, i)}
+              >
                 <option value="edit">Edit</option>
                 <option value="view">View</option>
                 <option value="remove">Remove</option>
