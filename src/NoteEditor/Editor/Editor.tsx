@@ -24,7 +24,6 @@ function Editor({
   const quillRef = useCallback((quill: Quill | null) => {
     setQuill(quill);
   }, []);
-  const [noteContent, setNoteContent] = useState(note.import());
 
   // Real time features
   const [isEditing, setIsEditing] = useState(false);
