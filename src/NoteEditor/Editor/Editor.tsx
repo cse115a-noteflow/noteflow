@@ -22,8 +22,9 @@ function Editor({
 
   function focusFirstLine() {
     if (!quill) return;
+    console.log('Focusing first line');
     const firstLine = quill.getLines(0, 1);
-    quill.setSelection(Math.max(0, firstLine[0].length() - 1));
+    quill.setSelection(Math.max(0, firstLine[0].length() - 1), 'silent');
     console.log(firstLine[0]);
     quill.focus();
   }

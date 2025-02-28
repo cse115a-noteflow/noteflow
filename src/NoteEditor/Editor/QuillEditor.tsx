@@ -2,12 +2,14 @@ import React, { forwardRef, useEffect, useLayoutEffect, useRef } from 'react';
 import Quill, { Delta, Op } from 'quill';
 // @ts-expect-error QuillMarkdown is not typed
 import QuillMarkdown from 'quilljs-markdown';
+import QuillCursors from 'quill-cursors';
 import 'quill/dist/quill.snow.css';
 import 'quilljs-markdown/dist/quilljs-markdown-common-style.css';
 import './QuillEditor.css';
 
-// https://quilljs.com/playground/react
+Quill.register('modules/cursors', QuillCursors);
 
+// https://quilljs.com/playground/react
 // _QuillEditor is an uncontrolled React component
 function _QuillEditor(
   {
@@ -62,6 +64,7 @@ function _QuillEditor(
       theme: 'snow',
       placeholder,
       modules: {
+        cursors: true,
         toolbar: false /*[
           [{ header: [1, 2, 3, 4, 5, 6, false] }],
           ['bold', 'italic', 'underline', 'strike'],

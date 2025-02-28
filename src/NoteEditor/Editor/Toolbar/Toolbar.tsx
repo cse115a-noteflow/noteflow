@@ -47,7 +47,7 @@ function Toolbar({
       if (!file || !note || !quill) return;
       const response = await note.uploadMedia(file);
       if (response !== null) {
-        quill.insertEmbed(quill.getSelection()?.index ?? 0, 'image', response);
+        quill.insertEmbed(quill.getSelection()?.index ?? 0, 'image', response, 'user');
       } else {
         alert('Failed to upload media. Try again later.');
       }
