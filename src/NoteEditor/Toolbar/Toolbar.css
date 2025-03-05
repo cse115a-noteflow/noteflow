@@ -13,7 +13,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background-color: #eee;
+  background-color: var(--background-color);
   border-bottom: 1px solid black;
 }
 .toolbar button:focus-visible {
@@ -30,3 +30,57 @@ hr {
   display: flex;
   gap: 5px;
 }
+
+.transparentBtn svg {
+  background-color: transparent;
+  color: var(--button-color); /* Ensures the icon follows theme text color */
+}
+
+.tools-text {
+  flex-grow: 0;
+  background-color: var(--foreground-color);
+  border-radius: 20px;
+  color: var(--primary-text)
+}
+
+.tools-text button {
+  background-color: transparent;
+  color: var(--button-color);
+}
+
+.tools-scribble {
+  flex-grow: 0;
+  background-color: var(--foreground-color);
+  border-radius: 20px;
+  color: var(--primary-text)
+}
+
+.tools-scribble button {
+  background-color: transparent;
+  color: var(--button-color);
+}
+
+.tools-media {
+  flex-grow: 0;
+  background-color: var(--foreground-color);
+  border-radius: 20px;
+  color: var(--primary-text)
+}
+
+.tools-media button {
+  background-color: transparent;
+  color: var(--button-color);
+}
+
+.tools-share {
+  flex-grow: 0;
+  background-color: var(--foreground-color);
+  border-radius: 20px;
+  color: var(--primary-text)
+}
+
+.tools-share button {
+  background-color: transparent;
+  color: var(--button-color);
+}
+

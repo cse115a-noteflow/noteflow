@@ -223,6 +223,8 @@
   --hover-color: #ddd;
   --disabled-opacity: 0.5;
   --skeleton-gradient: linear-gradient(90deg, #999 0%, #ddd 50%, #999 100%);
+
+  --background-toolbar-color: #eee;
 }
 */
 
@@ -238,4 +240,7 @@
   --hover-color: #555;
   --disabled-opacity: 0.3;
   --skeleton-gradient: linear-gradient(90deg, #555 0%, #777 50%, #555 100%);
+
+  --background-toolbar-color: #444
+
 }
