@@ -9,6 +9,8 @@ main {
   height: 100%;
   display: flex;
   flex-direction: column;
+  background-color: var(--background-toolbar-color);
+  color: var(--primary-text);
 }
 main .main-inner {
   width: 100%;
