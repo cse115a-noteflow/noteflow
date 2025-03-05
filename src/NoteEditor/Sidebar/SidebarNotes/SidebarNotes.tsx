@@ -19,18 +19,21 @@ function SidebarNotes({ setId, api }: { setId: (id: string | null) => void; api:
     if (loading) return;
     setLoading(true);
     try {
-      const result = await api.getNotes(searchQuery, cursor ?? undefined);
+      console.log("Fetching notes with sortOrder:", sortOrder);
+      const result = await api.getNotes(searchQuery, cursor ?? undefined, sortOrder); // Pass sortOrder
       if (result) {
         const newNotes = result.results.filter(
-          (note) => api.hasPermission(note.id, "view") || api.hasPermission(note.id, "edit") || note.owner === api.user?.uid
+          (note) =>
+            api.hasPermission(note.id, "view") ||
+            api.hasPermission(note.id, "edit") ||
+            note.owner === api.user?.uid
         );
-
-        // Merge notes while keeping existing ones
+  
         setNotes((prevNotes) => [
           ...prevNotes,
-          ...newNotes.filter((n) => !prevNotes.some((note) => note.id === n.id)) // Remove duplicates
+          ...newNotes.filter((n) => !prevNotes.some((note) => note.id === n.id)), // Remove duplicates
         ]);
-
+  
         setCursor(result.cursor);
       }
     } catch (error) {
@@ -38,36 +41,28 @@ function SidebarNotes({ setId, api }: { setId: (id: string | null) => void; api:
     }
     setLoading(false);
   }
+  
 
-  // Filter notes based on searchQuery
   useEffect(() => {
-    /*
+    setNotes([]); // Clear existing notes before fetching new ones
+    setCursor(null); // Reset pagination cursor
+    loadMore(); // Fetch new results
+  }, [searchQuery, sortOrder]); // Trigger when searchQuery or sortOrder changes
+  
+  // Filter notes based on searchQuery after fetching
+  useEffect(() => {
     if (!searchQuery) {
-      setFilteredNotes(notes); // Reset to all notes if search is empty
+      setFilteredNotes(notes); // Show all notes if search is empty
     } else {
-      setFilteredNotes(notes.filter((note) =>
-        note.title.toLowerCase().includes(searchQuery.toLowerCase())
-      ));
-    }
-    */
-    let sortedNotes = [...notes];
-
-    if (searchQuery) {
-      sortedNotes = sortedNotes.filter((note) =>
-        note.title.toLowerCase().includes(searchQuery.toLowerCase())
+      setFilteredNotes(
+        notes.filter((note) =>
+          note.title.toLowerCase().includes(searchQuery.toLowerCase())
+        )
       );
     }
+  }, [notes]); // Depend only on notes, since searchQuery is already handled in the previous useEffect
   
-    sortedNotes.sort((a, b) => 
-      sortOrder === 'asc' 
-        ? a.title.localeCompare(b.title) 
-        : b.title.localeCompare(a.title)
-    );
-  
-    setFilteredNotes(sortedNotes);
-  }, [searchQuery, notes, sortOrder]);
-
-  // Initial load
+  // Initial load when the component mounts
   useEffect(() => {
     loadMore();
   }, []);
@@ -84,13 +79,24 @@ function SidebarNotes({ setId, api }: { setId: (id: string | null) => void; api:
           />
           <Search />
         </div>
-        <button style={{ flexGrow: 0 }}
-          onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}>
-          <FilterAltOutlined />
-        </button>
-        <button style={{ flexGrow: 0 }} onClick={() => setId(null)}>
-          <Add />
-        </button>
+        <div className="filter">
+          <button 
+            onClick={() => {
+              const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+              console.log("Toggling Sort Order:", newSortOrder);
+              setSortOrder(newSortOrder);
+              setNotes([]); // Clear existing notes before fetching sorted ones
+              setCursor(null); // Reset pagination cursor
+            }}
+          >
+            <FilterAltOutlined />
+          </button>
+        </div>
+        <div className = "add">
+          <button style={{ flexGrow: 0 }} onClick={() => setId(null)}>
+            <Add />
+          </button>
+        </div>
       </div>
       <div className="note-list">
         {loading && notes.length === 0 && <div>Loading...</div>}

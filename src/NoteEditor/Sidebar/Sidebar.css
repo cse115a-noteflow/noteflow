@@ -1,6 +1,6 @@
 .sidebar {
   height: calc(100% - 32px);
-  background-color: #d9d9d9;
+  background-color: var(--background-color);
   width: 300px;
   padding: 16px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
@@ -22,7 +22,7 @@
 .sidebar-header input.title {
   background-color: transparent;
   white-space: wrap;
-  color: #333;
+  color: var(--primary-text);
   width: 100%;
   font-size: 1.5em;
   border: none;
@@ -39,15 +39,16 @@
   gap: 8px;
   padding: 16px 0;
   align-items: stretch;
-  border-bottom: 1px solid #000;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .search {
   display: flex;
   gap: 8px;
   padding: 8px 16px;
-  background-color: #fff;
+  background-color: var(--foreground-color);
   border-radius: 20px;
+  color: var(--button-color);
 }
 
 .search button {
@@ -72,7 +73,7 @@
 
 .search-result {
   padding: 16px;
-  background-color: #eee;
+  background-color: var(--accent-color);
   border-radius: 20px;
   display: flex;
   gap: 8px;
@@ -96,16 +97,53 @@
   border: none;
 }
 .search-actions button:hover {
-  background-color: #ddd;
+  background-color: var(--hover-color);
 }
 .search-result .skeleton {
   width: 100%;
   animation: scroll 1s linear infinite;
-  background: linear-gradient(90deg, #999 0%, #ddd 50%, #999 100%);
+  background: var(--skeleton-gradient);
   background-size: 200% 100%;
   border-radius: 0.5em;
   height: 1em;
 }
+
+.filter {
+  flex-grow: 0;
+  background-color: var(--foreground-color);
+  border-radius: 20px;
+  color: var(--primary-text)
+}
+
+.filter button {
+  background-color: transparent;
+  color: var(--button-color);
+}
+
+.add {
+  flex-grow: 0;
+  border-radius: 20px;
+  background-color: var(--foreground-color);
+  color: var(--primary-text)
+}
+
+.add button {
+  background-color: transparent;
+  color: var(--button-color);
+}
+
+.btn-row button {
+  flex-grow: 0;
+  border-radius: 20px;
+  background-color: var(--foreground-color);
+  color: var(--primary-text)
+}
+
+.search.disabled button {
+  background-color: transparent;
+  color: var(--button-color);
+}
+
 @keyframes scroll {
   0% {
     background-position: 0 0;
@@ -122,10 +160,12 @@
   padding-top: 16px;
   gap: 8px;
   flex-grow: 1;
+  color: var(--primary-text);
 }
 .note-filters {
   display: flex;
   gap: 8px;
+  color: #333;
 }
 
 .note-list {
@@ -138,7 +178,7 @@
 }
 .note-card {
   padding: 16px;
-  background-color: #fff;
+  background-color: var(--foreground-color);
   border-radius: 20px;
   cursor: pointer;
   display: flex;
@@ -147,4 +187,55 @@
 .note-card h3,
 .note-card p {
   margin: 0;
+  color: var(--primary-text);
+}
+
+.sidebar-header svg {
+  color: var(--primary-text); /* Ensures the icon follows theme text color */
+  font-size: 1.8em; /* Matches `fontSize="large"` */
+}
+
+.sidebar-header .text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar-header h2 {
+  font-size: 1.5em;
+  margin: 0;
+  line-height: 1.25em;
+  color: var(--secondary-text);
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+}
+
+/*Light mode (Default)*/
+/*
+:root {
+  --background-color: #d9d9d9;
+  --foreground-color: #ffffff;
+  --primary-text: #333333;
+  --secondary-text: #555;
+  --border-color: #000;
+  --button-color: #000;
+  --accent-color: #eee;
+  --hover-color: #ddd;
+  --disabled-opacity: 0.5;
+  --skeleton-gradient: linear-gradient(90deg, #999 0%, #ddd 50%, #999 100%);
+}
+*/
+
+/* Dark Mode */
+:root {
+  --background-color: #1e1e1e;
+  --foreground-color: #2b2b2b;
+  --primary-text: #e0e0e0;
+  --secondary-text: #bbb;
+  --border-color: #444;
+  --button-color: #e0e0e0;
+  --accent-color: #444;
+  --hover-color: #555;
+  --disabled-opacity: 0.3;
+  --skeleton-gradient: linear-gradient(90deg, #555 0%, #777 50%, #555 100%);
 }

@@ -95,7 +95,6 @@ function SidebarDetails({ note }: { note: Note }) {
               <>
                 <div className="btn-row search-actions">
                   <b>NoteFlow AI</b>
-                  <span style={{ flexGrow: 1 }} />
                   <button onClick={copySearchResult}>
                     <ContentCopy />
                   </button>
