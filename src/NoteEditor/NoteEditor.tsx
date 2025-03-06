@@ -11,7 +11,8 @@ function NoteEditor({ api }: { api: API }) {
   const [note, setNote] = useState<null | Note>(null);
   const [id, setId] = useState<string | null>(null);
   const [studyShown, setStudyShown] = useState(false);
-
+  const [isDark, setIsDark] = useState(true);
+  
   useEffect(() => {
     if (id !== null && note && note.id !== id) {
       setNote(null);
@@ -27,13 +28,13 @@ function NoteEditor({ api }: { api: API }) {
   }, [id]);
 
   return (
-    <div className="note-editor">
+    <div className="note-editor" data-theme={isDark ? "dark" : "light"}>
       <Sidebar note={note} setId={setId} api={api} />
       {note !== null && studyShown && <Study note={note} setStudyShown={setStudyShown} />}
       {note === null && <div>Loading...</div>}
       {note !== null && (
         <main>
-          <Toolbar note={note} setStudyShown={setStudyShown} />
+          <Toolbar note={note} setStudyShown={setStudyShown} isDark={isDark} setIsDark={setIsDark} />
           <div className="main-inner">
             <BlockRenderer note={note} />
           </div>

@@ -84,3 +84,90 @@ hr {
   color: var(--button-color);
 }
 
+.toggle-container {
+  display: flex;
+  align-items: center; /* Aligns toggle with text */
+  margin-left: 10px; /* Adds spacing from tools-media */
+  position: relative;
+}
+
+
+.toggle + label {
+  display: flex;
+  align-items: center;
+  font-size: 1.5em;
+  cursor: pointer;
+  color: var(--primary-text);
+  position: relative; /* Needed for absolute positioning */
+  padding-left: 2.5em; /* Makes space for toggle */
+}
+
+/* Toggle background */
+.toggle + label::before {
+  content: "";
+  height: 1em;
+  width: 2em;
+  border-radius: 1em;
+  background-color: var(--toggle-bg);
+  position: absolute;
+  left: 0;
+  transition: background-color 250ms ease-in-out;
+}
+
+/* Toggle slider */
+.toggle + label::after {
+  content: "";
+  height: 0.8em;
+  width: 0.8em;
+  border-radius: 50%;
+  background-color: var(--toggle-fg);
+  position: absolute;
+  left: 0.05em; /* Starts inside ::before */
+  top: 50%;
+  transform: translateY(-50%);
+  transition: transform 250ms ease-in-out;
+}
+
+/* Move the slider when checked */
+.toggle:checked + label::after {
+  transform: translate(1em, -50%);
+}
+
+:root {
+  --background-color: #d9d9d9;
+  --foreground-color: #ffffff;
+  --primary-text: #333333;
+  --secondary-text: #555;
+  --border-color: #000;
+  --button-color: #000;
+  --accent-color: #eee;
+  --hover-color: #ddd;
+  --disabled-opacity: 0.5;
+  --skeleton-gradient: linear-gradient(90deg, #999 0%, #ddd 50%, #999 100%);
+
+  --background-toolbar-color: #eee;
+
+  --toggle-fg: #cecece;
+  --toggle-bg: #ffffff;
+}
+
+
+/* Dark Mode */
+[data-theme="dark"] {
+  --background-color: #1e1e1e;
+  --foreground-color: #2b2b2b;
+  --primary-text: #e0e0e0;
+  --secondary-text: #bbb;
+  --border-color: #444;
+  --button-color: #e0e0e0;
+  --accent-color: #444;
+  --hover-color: #555;
+  --disabled-opacity: 0.3;
+  --skeleton-gradient: linear-gradient(90deg, #555 0%, #777 50%, #555 100%);
+  --text-background: #2b2b2b;
+  --background-toolbar-color: #444
+
+  --toggle-fg: #2b2b2b;
+  --toggle-bg: #444;
+
+}

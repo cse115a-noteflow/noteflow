@@ -4,8 +4,6 @@ import { Search, FilterAltOutlined, Add, DescriptionOutlined } from '@mui/icons-
 import { useEffect, useState } from 'react';
 import { PartialNote } from '../../../lib/types';
 
-
-
 function SidebarNotes({ setId, api }: { setId: (id: string | null) => void; api: API }) {
   const [notes, setNotes] = useState<PartialNote[]>([]); // Store all notes
   const [filteredNotes, setFilteredNotes] = useState<PartialNote[]>([]); // Store notes based on search/filter
@@ -13,6 +11,7 @@ function SidebarNotes({ setId, api }: { setId: (id: string | null) => void; api:
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  
 
   // Load more notes from API
   async function loadMore() {

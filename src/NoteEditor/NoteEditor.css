@@ -9,7 +9,7 @@ main {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background-color: var(--background-toolbar-color);
+  background-color: var(--text-background);
   color: var(--primary-text);
 }
 main .main-inner {

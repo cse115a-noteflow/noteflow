@@ -4,8 +4,18 @@ import './Toolbar.css';
 import { useState } from 'react';
 import getAuthToken from '../../services/getAuthToken';
 
-function Toolbar({ note, setStudyShown }: { note: Note; setStudyShown: (value: boolean) => void }) {
-  const [isSaving, setIsSaving] = useState(false);
+  function Toolbar({ 
+    note, 
+    setStudyShown, 
+    isDark, 
+    setIsDark 
+  }: { 
+    note: Note; 
+    setStudyShown: (value: boolean) => void; 
+    isDark: boolean; 
+    setIsDark: (value: boolean) => void; 
+  }) {
+    const [isSaving, setIsSaving] = useState(false);
 
   async function save() {
     setIsSaving(true);
@@ -92,6 +102,16 @@ function Toolbar({ note, setStudyShown }: { note: Note; setStudyShown: (value: b
         <button onClick={addMedia}>
           <Add />
         </button>
+      </div>
+      <div className="toggle-container">
+        <input
+          type="checkbox"
+          id="darkModeToggle"
+          className="toggle"
+          onChange={() => setIsDark(!isDark)}
+          checked={isDark}
+        />
+        <label htmlFor="check">Dark Mode</label>
       </div>
       <div style={{ flexGrow: '1' }} />
       <div className="tools-share">
