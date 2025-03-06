@@ -1,0 +1,16 @@
+.close-btn {
+    background-color: transparent;
+    border-color: transparent;
+    padding: 8px;
+  }
+  .close-btn:hover {
+    background-color: #f9f9f9;
+    border-color: #ddd;
+  }
+  .close-btn:focus,
+  .close-btn:focus-visible,
+  .close-btn:active {
+    outline: none;
+    border-color: #aaa;
+    background-color: #ccc;
+  }
