@@ -107,6 +107,14 @@ class Note extends EventEmitter {
     return await this.api.shareNote(this.id, emails, global);
   }
 
+  async acceptShareLink(shareToken: string) {
+    return await this.api.acceptShareLink(shareToken);
+  }
+
+  async generateShareLink(permission: "edit" | "view"): Promise<{ token: string } | null> {
+    return await this.api.generateShareLink(this.id, permission);
+  }
+
   async setTitle(newTitle: string) {
     const userId = this.api.user?.uid;
     if (!userId) return false;

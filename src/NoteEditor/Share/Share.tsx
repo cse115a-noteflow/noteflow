@@ -24,6 +24,9 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
     successes: [],
     failures: []
   });
+  const [shareToken, setShareToken] = useState("");
+  const [generatedLink, setGeneratedLink] = useState<string | null>(null);
+  const [selectedSharePermission, setSelectedSharePermission] = useState<"edit" | "view">("view");
 
   function validateEmail() {
     // Match email with a regular expression
@@ -80,6 +83,26 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
       setShareResult({ successes: response.successes, failures: response.failures });
     } else {
       setShareSuccess(false);
+    }
+
+    
+    }
+    async function handleAcceptShare() {
+      const success = await note.acceptShareLink(shareToken);
+      if (success) {
+        setShareToken("");
+        setShareShown(false);
+      } else {
+        alert("Failed to accept share link.");
+      }
+  }
+    async function generateShareLink() {
+      const response = await note.generateShareLink(selectedSharePermission);
+      if (response) {
+        setGeneratedLink(response.token);
+      } else {
+        alert("Failed to generate share link. Try again.");
+      
     }
   }
   if (shareSuccess === true) {
@@ -168,6 +191,34 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
             <p style={{ margin: '8px', fontStyle: 'italic' }}>
               Enter an email to share with a specific user...
             </p>
+          )}
+        </div>
+        <div className="share-link">
+          <label>Enter a Share Link</label>
+          <div className="btn-row">
+            <input
+              type="text"
+              placeholder="Paste Share Link Here"
+              value={shareToken}
+              onChange={(e) => setShareToken(e.target.value)}
+            />
+            <button onClick={handleAcceptShare}>Accept</button>
+          </div>
+        </div>
+        <div className="share-link">
+          <h3>Generate Share Link</h3>
+          <label>Permission:</label>
+          <select value={selectedSharePermission} onChange={(e) => setSelectedSharePermission(e.target.value as "edit" | "view")}>
+            <option value="edit">Edit</option>
+            <option value="view">View</option>
+          </select>
+          <button onClick={generateShareLink}>Generate Link</button>
+
+          {generatedLink && (
+            <div className="generated-link">
+              <input type="text" readOnly value={generatedLink} />
+              <button onClick={() => navigator.clipboard.writeText(generatedLink)}>Copy</button>
+            </div>
           )}
         </div>
         <div className="email">
