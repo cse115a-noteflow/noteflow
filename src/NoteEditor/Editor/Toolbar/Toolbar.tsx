@@ -1,18 +1,26 @@
-import { Add, Edit, Menu, Wifi, WifiOff } from '@mui/icons-material';
+import { Add, Edit, TextFields, Menu, Wifi, WifiOff } from '@mui/icons-material';
 import Note from '../../../lib/Note';
 import './Toolbar.css';
 import { useEffect, useState } from 'react';
 import Quill from 'quill';
 import TextToolbar from './TextToolbar/TextToolbar';
+import { FabricJSEditor } from 'fabricjs-react';
+import ScribbleToolbar from './ScribbleToolbar/ScribbleToolbar';
 
 function Toolbar({
   note,
   quill,
+  fabric,
+  editorMode,
+  setEditorMode,
   setShareShown,
   toggleSidebarCollapsed
 }: {
   note: Note;
   quill: Quill | null;
+  fabric: FabricJSEditor | null;
+  editorMode: 'text' | 'scribble';
+  setEditorMode: (value: 'text' | 'scribble') => void;
   setShareShown: (value: boolean) => void;
   toggleSidebarCollapsed: () => void;
 }) {
@@ -62,12 +70,22 @@ function Toolbar({
       </button>
       <hr />
       <p>{note.documentRef ? <Wifi /> : <WifiOff />}</p>
-      {quill && <TextToolbar quill={quill} />}
-      <div className="tools scribble">
-        <button>
-          <Edit />
-        </button>
-      </div>
+      {quill && editorMode === 'text' && <TextToolbar quill={quill} />}
+      {(editorMode !== 'text' || !quill) && (
+        <div className="tools text">
+          <button onClick={() => setEditorMode('text')}>
+            <TextFields />
+          </button>
+        </div>
+      )}
+      {fabric && editorMode === 'scribble' && <ScribbleToolbar fabric={fabric} />}
+      {editorMode !== 'scribble' && (
+        <div className="tools scribble">
+          <button onClick={() => setEditorMode('scribble')}>
+            <Edit />
+          </button>
+        </div>
+      )}
       <div className="tools media">
         <button onClick={addMedia}>
           <Add />

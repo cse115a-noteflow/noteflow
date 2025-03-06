@@ -10,12 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@arch-inc/fabricjs-psbrush": "^0.0.20",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.2",
     "@mui/material": "^6.4.2",
     "axios": "^1.7.9",
+    "fabric": "^6.6.1",
+    "fabricjs-react": "^2.1.0",
     "firebase": "^11.2.0",
+    "iink-ts": "^3.0.0",
     "katex": "^0.16.21",
     "lodash": "^4.17.21",
     "quill": "^2.0.3",

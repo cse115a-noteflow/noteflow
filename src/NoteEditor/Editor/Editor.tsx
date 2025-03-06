@@ -4,6 +4,7 @@ import Toolbar from './Toolbar/Toolbar';
 import '../NoteEditor.css';
 import Quill from 'quill';
 import QuillEditor from './QuillEditor';
+import { FabricJSCanvas, useFabricJSEditor } from 'fabricjs-react';
 
 function Editor({
   note,
@@ -19,6 +20,8 @@ function Editor({
   const quillRef = useCallback((quill: Quill | null) => {
     setQuill(quill);
   }, []);
+  const [editorMode, setEditorMode] = useState<'text' | 'scribble'>('text');
+  const { editor, onReady } = useFabricJSEditor();
 
   function focusFirstLine() {
     if (!quill) return;
@@ -47,6 +50,9 @@ function Editor({
       <Toolbar
         note={note}
         quill={quill}
+        fabric={editor ?? null}
+        editorMode={editorMode}
+        setEditorMode={setEditorMode}
         setShareShown={setShareShown}
         toggleSidebarCollapsed={toggleSidebarCollapsed}
       />
@@ -56,6 +62,7 @@ function Editor({
         defaultValue={note.import()}
         ref={quillRef}
       />
+      <FabricJSCanvas className="fabric-canvas" onReady={onReady} />
     </main>
   );
 }
