@@ -2,10 +2,11 @@ import { FirebaseApp } from 'firebase/app';
 import Note from './Note';
 import { PartialNote, SerializedNote } from './types';
 import axios from 'axios';
-import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { User, getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { Firestore, getFirestore } from 'firebase/firestore';
 import { getStorage, type FirebaseStorage } from 'firebase/storage';
 import { NotePermissionState } from './types';
+
 
 export const DEFAULT_DATA: SerializedNote = {
   id: '1',
@@ -120,6 +121,63 @@ class API {
 
   get auth() {
     return getAuth(this.app);
+  }
+
+  async getAuthToken(): Promise<string> {
+    const user: User | null = this.auth.currentUser;
+    if (!user) {
+      console.error("No authenticated user found.");
+      return "";
+    }
+    return await user.getIdToken();
+  }
+
+  async generateShareLink(noteId: string, permission: "edit" | "view"): Promise<{ token: string } | null> {
+    const authToken = await this.getAuthToken();
+    if (!authToken) {
+      console.error("Failed to retrieve auth token.");
+      return null;
+    }
+  
+    try {
+      const response = await this.POST(`/notes/${noteId}/generate-share-link`, {
+        permission
+      });
+  
+      if (response[0] !== 200) {
+        console.error("Error generating share link:", response[1]);
+        return null;
+      }
+  
+      return response[1] as { token: string };
+    } catch (error) {
+      console.error("Network error generating share link:", error);
+      return null;
+    }
+  }
+
+  async acceptShareLink(shareToken: string): Promise<boolean> {
+    const authToken = await this.getAuthToken();
+    if (!authToken) {
+      console.error("Failed to retrieve auth token.");
+      return false;
+    }
+  
+    try {
+      const response = await this.POST(`/notes/accept-share-link`, {
+        shareToken
+      });
+  
+      if (response[0] !== 200) {
+        console.error("Error accepting share link:", response[1]);
+        return false;
+      }
+  
+      return true;
+    } catch (error) {
+      console.error("Network error accepting share link:", error);
+      return false;
+    }
   }
 
   async signInWithGoogle() {
