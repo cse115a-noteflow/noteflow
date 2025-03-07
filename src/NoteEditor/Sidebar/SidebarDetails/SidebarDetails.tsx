@@ -1,4 +1,5 @@
 import Note from '../../../lib/Note';
+import API from '../../../lib/API';
 import {
   DescriptionOutlined,
   Send,
@@ -11,13 +12,16 @@ import {
 import '../Sidebar.css';
 import { useEffect, useState } from 'react';
 import { type StudyMode } from '../../Study/Study';
+import SettingsMenu from '../../Settings/Settings';
 
 function SidebarDetails({
   note,
-  setStudyMode
+  setStudyMode,
+  api
 }: {
   note: Note | null;
   setStudyMode: (value: StudyMode) => void;
+  api: API;
 }) {
   const [_, forceUpdate] = useState(0);
   const [editing, setEditing] = useState(false);
@@ -27,6 +31,7 @@ function SidebarDetails({
   const [query, setQuery] = useState('');
   const [loadingResult, setLoadingResult] = useState(false);
   const [searchResult, setSearchResult] = useState<string | null>(null);
+  const [settingsShown, setSettingsShown] = useState(false);
 
   function submitName() {
     note?.setTitle(draftName);
@@ -161,9 +166,12 @@ function SidebarDetails({
           </div>
         )}
         <div className="btn-row">
-          <button>
+          <button onClick={() => setSettingsShown(true)}>
             <Settings />
           </button>
+          {api !== null && settingsShown && (
+            <SettingsMenu api={api} setSettingsShown={setSettingsShown} />
+          )}
           <button
             title="Generate flashcards"
             onClick={() => setStudyMode('flashcards')}

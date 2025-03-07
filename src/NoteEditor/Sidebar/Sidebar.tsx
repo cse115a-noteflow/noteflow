@@ -21,7 +21,7 @@ function Sidebar({
   return (
     <div className={'sidebar-wrapper ' + (collapsed ? 'collapsed' : '')}>
       <div className="sidebar">
-        <SidebarDetails note={note} setStudyMode={setStudyMode} />
+        <SidebarDetails note={note} setStudyMode={setStudyMode} api={api} />
         <SidebarNotes setId={setId} note={note} api={api} />
       </div>
     </div>
