@@ -4,13 +4,13 @@ import './Toolbar.css';
 import { useEffect, useState } from 'react';
 import Quill from 'quill';
 import TextToolbar from './TextToolbar/TextToolbar';
-import { FabricJSEditor } from 'fabricjs-react';
 import ScribbleToolbar from './ScribbleToolbar/ScribbleToolbar';
+import { InteractiveInkEditor } from 'iink-ts';
 
 function Toolbar({
   note,
   quill,
-  fabric,
+  iink,
   editorMode,
   setEditorMode,
   setShareShown,
@@ -18,7 +18,7 @@ function Toolbar({
 }: {
   note: Note;
   quill: Quill | null;
-  fabric: FabricJSEditor | null;
+  iink: InteractiveInkEditor | null;
   editorMode: 'text' | 'scribble';
   setEditorMode: (value: 'text' | 'scribble') => void;
   setShareShown: (value: boolean) => void;
@@ -78,7 +78,7 @@ function Toolbar({
           </button>
         </div>
       )}
-      {fabric && editorMode === 'scribble' && <ScribbleToolbar fabric={fabric} />}
+      {iink && editorMode === 'scribble' && <ScribbleToolbar iink={iink} />}
       {editorMode !== 'scribble' && (
         <div className="tools scribble">
           <button onClick={() => setEditorMode('scribble')}>

@@ -79,6 +79,7 @@ button {
   font-family: inherit;
   background-color: #ffffff;
   border: 1px solid #cccccc;
+  color: black;
   cursor: pointer;
   transition:
     border-color 0.2s,

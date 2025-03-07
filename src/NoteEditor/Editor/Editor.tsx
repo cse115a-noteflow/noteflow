@@ -4,7 +4,8 @@ import Toolbar from './Toolbar/Toolbar';
 import '../NoteEditor.css';
 import Quill from 'quill';
 import QuillEditor from './QuillEditor';
-import { FabricJSCanvas, useFabricJSEditor } from 'fabricjs-react';
+import IinkEditor from './IinkEditor';
+import { InteractiveInkEditor } from 'iink-ts';
 
 function Editor({
   note,
@@ -20,8 +21,13 @@ function Editor({
   const quillRef = useCallback((quill: Quill | null) => {
     setQuill(quill);
   }, []);
+  // Fabric
   const [editorMode, setEditorMode] = useState<'text' | 'scribble'>('text');
-  const { editor, onReady } = useFabricJSEditor();
+  const [iink, setIink] = useState<InteractiveInkEditor | null>(null);
+  const iinkRef = useCallback((editor: InteractiveInkEditor | null) => {
+    setIink(editor);
+  }, []);
+  const [editorHeight, setEditorHeight] = useState(62);
 
   function focusFirstLine() {
     if (!quill) return;
@@ -32,6 +38,21 @@ function Editor({
     quill.focus();
   }
 
+  function calculateHeight() {
+    let height = 62;
+    if (!quill) return height;
+    const quillContainer = quill.container;
+    if (quillContainer) {
+      height = quillContainer.getBoundingClientRect().height || 62;
+    }
+
+    if (note.iink) {
+      console.log(note.iink.model.height);
+      height = Math.max(height, note.iink.model.height);
+    }
+    return height;
+  }
+
   useEffect(() => {
     if (quill) {
       note.quill = quill;
@@ -40,29 +61,44 @@ function Editor({
         if (type === 'realtime-start') {
           focusFirstLine();
         }
+        setEditorHeight(calculateHeight());
       });
       return () => note.destroySession();
     }
   }, [quill, note.documentRef]);
+
+  useEffect(() => {
+    if (iink) {
+      note.initializeIink(iink);
+    }
+  }, [iink]);
 
   return (
     <main>
       <Toolbar
         note={note}
         quill={quill}
-        fabric={editor ?? null}
+        iink={iink}
         editorMode={editorMode}
         setEditorMode={setEditorMode}
         setShareShown={setShareShown}
         toggleSidebarCollapsed={toggleSidebarCollapsed}
       />
-      <QuillEditor
-        key={note.id}
-        placeholder="Write something new..."
-        defaultValue={note.import()}
-        ref={quillRef}
-      />
-      <FabricJSCanvas className="fabric-canvas" onReady={onReady} />
+      <div className="editor-wrapper" style={{ height: editorHeight }}>
+        <QuillEditor
+          key={note.id}
+          placeholder="Write something new..."
+          defaultValue={note.import()}
+          readOnly={editorMode === 'scribble'}
+          ref={quillRef}
+        />
+        <IinkEditor
+          style={{ pointerEvents: editorMode === 'scribble' ? 'all' : 'none' }}
+          height={window.innerHeight - 100}
+          width={700}
+          ref={iinkRef}
+        />
+      </div>
     </main>
   );
 }

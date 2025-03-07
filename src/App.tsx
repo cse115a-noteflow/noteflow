@@ -33,6 +33,7 @@ function App() {
       unsubscribe();
     });
   });
+  return <NoteEditor api={api} />;
 
   console.log('User:', user);
 

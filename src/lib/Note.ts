@@ -9,6 +9,7 @@ import { throttle } from 'lodash';
 import QuillCursors from 'quill-cursors';
 import colorFromUID from './colorFromUID';
 import diffDeltas from './diffDeltas';
+import { InteractiveInkEditor } from 'iink-ts';
 
 class Note extends EventEmitter {
   id: string;
@@ -23,6 +24,7 @@ class Note extends EventEmitter {
   documentRef: DocumentReference | null;
   // Quill
   quill: Quill | null = null;
+  iink: InteractiveInkEditor | null = null;
   hasLocalChanges = false;
   isEditing = false;
   private unsubscribe: (() => void) | null = null;
@@ -190,8 +192,12 @@ class Note extends EventEmitter {
         }
       });
       console.log('Realtime session started.');
-    } else if (this.quill) {
+    }
+    if (this.quill) {
       this.emit('realtime-start');
+      this.quill.on('text-change', () => {
+        this.emit('block-update');
+      });
     }
   }
 
@@ -223,6 +229,16 @@ class Note extends EventEmitter {
         });
       }
     }
+  }
+
+  /* iink handlers */
+  initializeIink(iink: InteractiveInkEditor) {
+    this.iink = iink;
+    console.log(iink.renderer.parent.parentElement?.parentElement);
+    iink.event.addChangedListener(() => {
+      console.log('update');
+      this.emit('block-update');
+    });
   }
 
   /* Quill handlers */
