@@ -1,77 +1,76 @@
-#close-btn {
-    background-color: transparent;
-    padding: 8px;
-    font-size: 1em;
-    font-weight: 500;
-    font-family: inherit;
-    cursor: pointer;
-  }
-  #close-btn:hover {
-    color: #5a5a5a;
-  }
+.closeBtn {
+  margin: auto;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  border: none;
+}
+.closeBtn:hover {
+  background-color: #ddd;
+}
+.modal-inner hr {
+  width: 100%;
+  height: 1px;
+  margin-bottom: 1em;
+}
+.modal-inner h2 {
+  font-size: 1.5em;
+  margin-top: 0;
+  margin-bottom: 1em;
+}
 
-  .header-cont {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-  }
+.header-cont {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
 
-  .settings-container {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-  }
-  
-  .switch-button {
-    margin-top: 10px;
-    position: relative;
-    width: 55px;
-    height: 30px;
-    background-color: #e1e1e1;
-    border-radius: 15px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    border: none;
-  }
-  
-  .switch-button.on {
-    background-color: #424059;
-  }
-  
-  .switch-handle {
-    position: absolute;
-    top: 5px;
-    left: 5px;
-    width: 20px;
-    height: 20px;
-    background-color: #fff;
-    border-radius: 50%;
-    transition: transform 0.3s;
-  }
-  
-  .switch-button.on .switch-handle {
-    transform: translateX(25px);
-  }
-  
-  .settings-header{
-    align-items:center;
-  }
-  
-  .settings-modal-inner {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    max-width: 200px;
-    width: 100%;
-    position: relative;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
-  .switch-container{
-    margin-top: 15px;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-  }
+.option {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  margin-bottom: 1em;
+  justify-content: space-between;
+}
+
+.switch-button {
+  margin-top: 10px;
+  position: relative;
+  width: 55px;
+  height: 30px;
+  background-color: #e1e1e1;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  border: none;
+}
+
+.switch-button.on {
+  background-color: #424059;
+}
+
+.switch-handle {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 20px;
+  height: 20px;
+  background-color: #fff;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+.switch-button.on .switch-handle {
+  transform: translateX(25px);
+}
+
+.settings-header {
+  align-items: center;
+}
+.switch-container {
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}

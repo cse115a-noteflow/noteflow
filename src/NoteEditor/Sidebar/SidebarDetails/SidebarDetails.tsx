@@ -16,12 +16,12 @@ import SettingsMenu from '../../Settings/Settings';
 
 function SidebarDetails({
   note,
-  setStudyMode, 
+  setStudyMode,
   api
 }: {
   note: Note | null;
   setStudyMode: (value: StudyMode) => void;
-  api: API
+  api: API;
 }) {
   const [_, forceUpdate] = useState(0);
   const [editing, setEditing] = useState(false);
@@ -166,10 +166,12 @@ function SidebarDetails({
           </div>
         )}
         <div className="btn-row">
-          <button onClick = {() => setSettingsShown(true)}>
+          <button onClick={() => setSettingsShown(true)}>
             <Settings />
           </button>
-          {api !== null && settingsShown && <SettingsMenu api={api} setSettingsShown={setSettingsShown} />}
+          {api !== null && settingsShown && (
+            <SettingsMenu api={api} setSettingsShown={setSettingsShown} />
+          )}
           <button
             title="Generate flashcards"
             onClick={() => setStudyMode('flashcards')}
