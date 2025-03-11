@@ -21,18 +21,18 @@ function SidebarNotes({
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-  async function loadMore() {
+  async function loadMore(reset = false) {
     if (loading) return;
     setLoading(true);
     try {
-      const result = await api.getNotes(undefined, cursor ?? undefined);
+      const result = await api.getNotes(undefined, reset ? undefined : cursor ?? undefined);
       if (result) {
         console.log('Fetched notes:', result);
-        setNotes(
-          [...notes, ...result.results].filter(
-            (note, index, self) => self.findIndex((n) => n.id === note.id) === index // Remove duplicates
-          )
+
+        setNotes(prevNotes => reset ? result.results : [...prevNotes, ...result.results]
+          .filter((note, index, self) => self.findIndex(n => n.id === note.id) === index) // Remove duplicates
         );
+
         setCursor(result.cursor);
       }
     } catch (error) {
@@ -41,29 +41,36 @@ function SidebarNotes({
     setLoading(false);
   }
 
-  // Filter notes based on searchQuery and sort order
   useEffect(() => {
     let sortedNotes = [...notes];
-
     if (searchQuery) {
       sortedNotes = sortedNotes.filter((note) =>
         note.title.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-
     sortedNotes.sort((a, b) =>
       sortOrder === 'asc' 
         ? a.title.localeCompare(b.title) 
         : b.title.localeCompare(a.title)
     );
-
     setFilteredNotes(sortedNotes);
   }, [searchQuery, notes, sortOrder]);
 
   useEffect(() => {
     console.log('Loading notes');
     setNotes([]);
-    loadMore();
+    loadMore(true);
+  }, []);
+
+  useEffect(() => {
+    function handleNoteSaved() {
+      console.log("Note saved, reloading notes...");
+      setNotes([]);
+      setCursor(null);
+      loadMore(true);
+    }
+    document.addEventListener("noteSaved", handleNoteSaved);
+    return () => document.removeEventListener("noteSaved", handleNoteSaved);
   }, []);
 
   return (
@@ -109,7 +116,7 @@ function SidebarNotes({
           </div>
         ))}
         {!loading && cursor && (
-          <button onClick={loadMore} className="load-more-btn">Load More</button>
+          <button onClick={() => loadMore()} className="load-more-btn">Load More</button>
         )}
       </div>
     </div>
@@ -117,3 +124,4 @@ function SidebarNotes({
 }
 
 export default SidebarNotes;
+
