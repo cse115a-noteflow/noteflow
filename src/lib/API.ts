@@ -275,6 +275,24 @@ class API {
       return null;
     }
   }
+
+  async addNoteFromSharedLink(id: string): Promise<boolean> {
+    try {      
+      console.log("adding note with id:",id);
+      const [status,data] = await this.POST(`/notes/${id}/link`, {});
+  
+      if (status === 200) {
+        console.log("Note successfully added from shared link");
+        return true;
+      }
+      else{
+        console.error(status, "\tdata:", data);
+      }
+    } catch (error) {
+      console.error("Error adding note from shared link:", error);
+      return false;
+    }
+  }
 }
 
 export default API;

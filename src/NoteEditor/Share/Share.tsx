@@ -166,7 +166,7 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
           ))}
           {draftEmails.length === 0 && (
             <p style={{ margin: '8px', fontStyle: 'italic' }}>
-              Enter an email to share with a specific user...
+              Enter user associated email(s) to share...
             </p>
           )}
         </div>
