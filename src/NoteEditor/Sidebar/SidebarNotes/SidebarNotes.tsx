@@ -1,9 +1,17 @@
 import '../Sidebar.css';
 import type API from '../../../lib/API';
-import { Search, FilterAltOutlined, Add, DescriptionOutlined } from '@mui/icons-material';
+import {
+  Search,
+  VerticalAlignTop,
+  VerticalAlignBottom,
+  Add,
+  DescriptionOutlined,
+  Close
+} from '@mui/icons-material';
 import { useEffect, useState } from 'react';
 import { PartialNote } from '../../../lib/types';
 import Note from '../../../lib/Note';
+import { throttle } from 'lodash';
 
 function SidebarNotes({
   setId,
@@ -15,62 +23,47 @@ function SidebarNotes({
   api: API;
 }) {
   const [notes, setNotes] = useState<PartialNote[]>([]); // Store all notes
-  const [filteredNotes, setFilteredNotes] = useState<PartialNote[]>([]); // Store notes based on search/filter
   const [cursor, setCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   async function loadMore(reset = false) {
+    console.log('Loading notes');
+    let oldNotes = notes;
+    let oldCursor = cursor;
+    if (reset) {
+      oldNotes = [];
+      setNotes([]);
+      oldCursor = null;
+      setCursor(null);
+    }
     if (loading) return;
     setLoading(true);
     try {
-      const result = await api.getNotes(undefined, reset ? undefined : cursor ?? undefined);
+      const result = await api.getNotes(searchQuery, oldCursor);
       if (result) {
-        console.log('Fetched notes:', result);
-
-        setNotes(prevNotes => reset ? result.results : [...prevNotes, ...result.results]
-          .filter((note, index, self) => self.findIndex(n => n.id === note.id) === index) // Remove duplicates
-        );
-
+        setNotes([...oldNotes, ...result.results]);
         setCursor(result.cursor);
       }
     } catch (error) {
-      console.error("Error fetching notes:", error);
+      console.error('Error fetching notes:', error);
     }
     setLoading(false);
   }
 
-  useEffect(() => {
-    let sortedNotes = [...notes];
-    if (searchQuery) {
-      sortedNotes = sortedNotes.filter((note) =>
-        note.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-    sortedNotes.sort((a, b) =>
-      sortOrder === 'asc' 
-        ? a.title.localeCompare(b.title) 
-        : b.title.localeCompare(a.title)
-    );
-    setFilteredNotes(sortedNotes);
-  }, [searchQuery, notes, sortOrder]);
+  const throttleLoad = throttle(() => loadMore(true), 2000);
 
   useEffect(() => {
-    console.log('Loading notes');
-    setNotes([]);
-    loadMore(true);
-  }, []);
+    throttleLoad();
+  }, [sortOrder, searchQuery]);
 
   useEffect(() => {
     function handleNoteSaved() {
-      console.log("Note saved, reloading notes...");
-      setNotes([]);
-      setCursor(null);
       loadMore(true);
     }
-    document.addEventListener("noteSaved", handleNoteSaved);
-    return () => document.removeEventListener("noteSaved", handleNoteSaved);
+    document.addEventListener('noteSaved', handleNoteSaved);
+    return () => document.removeEventListener('noteSaved', handleNoteSaved);
   }, []);
 
   return (
@@ -81,15 +74,23 @@ function SidebarNotes({
             type="text"
             placeholder="Search notes"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              if (e.target.value !== searchQuery) setSearchQuery(e.target.value);
+            }}
           />
-          <Search />
+          {searchQuery ? (
+            <button onClick={() => setSearchQuery('')}>
+              <Close />
+            </button>
+          ) : (
+            <Search />
+          )}
         </div>
         <button
           style={{ flexGrow: 0 }}
           onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
         >
-          <FilterAltOutlined />
+          {sortOrder === 'asc' ? <VerticalAlignTop /> : <VerticalAlignBottom />}
         </button>
         <button
           className={note && note.id === '' ? 'active' : ''}
@@ -100,9 +101,8 @@ function SidebarNotes({
         </button>
       </div>
       <div className="note-list">
-        {(filteredNotes.length === 0 && loading) && <div>Loading...</div>}
-        {filteredNotes.length === 0 && !loading && <div>No notes found</div>}
-        {filteredNotes.map((note) => (
+        {notes.length === 0 && !loading && <div>No notes found</div>}
+        {notes.map((note) => (
           <div
             key={note.id}
             className={`note-card ${note.id === (note?.id || null) ? 'selected' : ''}`}
@@ -116,7 +116,16 @@ function SidebarNotes({
           </div>
         ))}
         {!loading && cursor && (
-          <button onClick={() => loadMore()} className="load-more-btn">Load More</button>
+          <button onClick={() => loadMore()} className="load-more-btn">
+            Load More
+          </button>
+        )}
+        {loading && (
+          <>
+            <div className="skeleton" style={{ height: 75, borderRadius: 20 }} />
+            <div className="skeleton" style={{ height: 75, borderRadius: 20 }} />
+            <div className="skeleton" style={{ height: 75, borderRadius: 20 }} />
+          </>
         )}
       </div>
     </div>
@@ -124,4 +133,3 @@ function SidebarNotes({
 }
 
 export default SidebarNotes;
-
