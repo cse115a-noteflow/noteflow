@@ -25,7 +25,9 @@ export const DEFAULT_DATA: SerializedNote = {
   owner: '1',
   permissions: {
     global: 'edit',
-    user: {}
+    edit: [],
+    view: [],
+    names: {}
   }
 };
 
@@ -147,11 +149,11 @@ class API {
   }
 
   // METHODS
-  async getNotes(query?: string, cursor?: string) {
+  async getNotes(query?: string | null, cursor?: string | null) {
     let url = '/notes';
     const params = [];
     if (query) params.push(`q=${encodeURIComponent(query)}`);
-    if (cursor) params.push(`cursor=${cursor}`);
+    if (cursor) params.push(`cursor=${encodeURIComponent(cursor)}`);
     if (params.length) url += '?' + params.join('&');
     const [status, data] = await this.GET(url);
     if (status !== 200) return null;
@@ -178,7 +180,7 @@ class API {
       if (!userId) return null;
       if (
         note.owner !== userId &&
-        note.permissions.user[userId]?.permission !== 'edit' &&
+        !note.permissions.edit.includes(userId) &&
         note.permissions.global !== 'edit'
       ) {
         alert('You do not have permission to edit this note.');
@@ -254,7 +256,7 @@ class API {
       }
 
       // Check user-specific permission
-      if (note.permissions.user[userId]?.permission === permission) {
+      if (note.permissions[permission].includes(userId)) {
         return true;
       }
 
