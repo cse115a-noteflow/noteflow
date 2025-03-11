@@ -1,6 +1,6 @@
 import '../Sidebar.css';
 import type API from '../../../lib/API';
-import { Search, FilterAltOutlined, Add, DescriptionOutlined } from '@mui/icons-material';
+import { Search, FilterAltOutlined, Add, DescriptionOutlined, Delete } from '@mui/icons-material';
 import { useEffect, useState } from 'react';
 import { PartialNote } from '../../../lib/types';
 import Note from '../../../lib/Note';
@@ -20,6 +20,7 @@ function SidebarNotes({
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [deleteShown, setDeleteShown] = useState(false);
 
   async function loadMore(reset = false) {
     if (loading) return;
@@ -113,10 +114,21 @@ function SidebarNotes({
               <h3>{note.title}</h3>
               <p>{note.description}</p>
             </div>
+            <button onClick = {() => setDeleteShown(true)}><Delete/></button>
           </div>
         ))}
         {!loading && cursor && (
           <button onClick={() => loadMore()} className="load-more-btn">Load More</button>
+        )}
+        {note && note.owner === api.user?.uid && deleteShown &&(
+          <div className="modal" onClick={() => setDeleteShown(false)}>
+            <div className="modal-inner" onClick={(e) => e.stopPropagation()}>
+              <h2>Delete "{note.title}"?</h2>
+              <p>This action cannot be undone.</p>
+              <button onClick = {()=> setDeleteShown(false)}>Cancel</button>
+              <button onClick={(e) => {e.preventDefault(); api.deleteNote(note.id);}}>Confirm</button>
+            </div>
+          </div>
         )}
       </div>
     </div>
