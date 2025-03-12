@@ -1,4 +1,11 @@
-import { doc, DocumentReference, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
+import {
+  doc,
+  DocumentReference,
+  FieldValue,
+  onSnapshot,
+  serverTimestamp,
+  setDoc
+} from 'firebase/firestore';
 import API from './API';
 import EventEmitter from './EventEmitter';
 import { Block, FlashCard, Permissions, SerializedNote, SerializedCursor } from './types';
@@ -17,6 +24,8 @@ class Note extends EventEmitter {
   content: Block[];
   owner: string;
   permissions: Permissions;
+  updatedAt?: FieldValue;
+  createdAt?: FieldValue;
   api: API;
   cursors: { [uid: string]: SerializedCursor };
   // Firestore
@@ -24,6 +33,7 @@ class Note extends EventEmitter {
   // Quill
   quill: Quill | null = null;
   hasLocalChanges = false;
+  hasLocalContent = false;
   isEditing = false;
   private unsubscribe: (() => void) | null = null;
   private throttleSave: () => void;
@@ -38,6 +48,8 @@ class Note extends EventEmitter {
       this.content = note.content;
       this.owner = note.owner;
       this.permissions = note.permissions;
+      this.updatedAt = note.updatedAt;
+      this.createdAt = note.createdAt;
       this.documentRef = doc(api.firestore, 'notes', this.id);
     } else {
       // Not a real note id, but used to set it apart
@@ -45,6 +57,8 @@ class Note extends EventEmitter {
       this.title = 'Unnamed Note';
       this.description = '';
       this.cursors = {};
+      this.updatedAt = serverTimestamp();
+      this.createdAt = serverTimestamp();
       this.content = [
         {
           id: v4(),
@@ -69,7 +83,7 @@ class Note extends EventEmitter {
         const saving: { [key: string]: unknown } = {};
         saving.updatedAt = serverTimestamp();
 
-        if (this.hasLocalChanges) {
+        if (this.hasLocalContent) {
           saving.content = this.export(this.quill.getContents());
         }
 
@@ -89,6 +103,9 @@ class Note extends EventEmitter {
         if (Object.keys(saving).length === 0) return;
 
         console.log('Saving content to Firestore:', saving);
+        // Since saving takes time, set to false before the request sends
+        // So that we can capture typing while it's saving
+        this.hasLocalContent = false;
         await setDoc(this.documentRef, saving, { merge: true }).catch(console.error);
         this.emit('update', saving);
         this.hasLocalChanges = false;
@@ -103,7 +120,9 @@ class Note extends EventEmitter {
       description: this.description,
       content: this.content,
       owner: this.owner,
-      permissions: this.permissions
+      permissions: this.permissions,
+      updatedAt: this.updatedAt ?? serverTimestamp(),
+      createdAt: this.createdAt ?? serverTimestamp()
     };
   }
 
@@ -130,6 +149,16 @@ class Note extends EventEmitter {
     }
   }
 
+  hasEditPermissions() {
+    const userId = this.api.user?.uid;
+    if (!userId) return false;
+    return (
+      this.owner === userId ||
+      this.permissions.global === 'edit' ||
+      this.permissions.edit.includes(userId)
+    );
+  }
+
   /* Firebase realtime */
   /**
    * Saves a note to the database.
@@ -139,6 +168,7 @@ class Note extends EventEmitter {
    * @returns The saved note, or null if the save failed.
    */
   async save(hard = true) {
+    if (!this.hasEditPermissions()) return;
     if (hard) {
       const result = await this.api.saveNote(this);
       if (result !== null) this.emit('save');
@@ -184,6 +214,7 @@ class Note extends EventEmitter {
       this.quill.on('text-change', (_delta, _oldDelta, source) => {
         if (source === 'user') {
           this.hasLocalChanges = true; // Mark change as local
+          this.hasLocalContent = true; // Mark content as local
           this.isEditing = true;
           this.save(false);
 

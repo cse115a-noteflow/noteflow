@@ -83,6 +83,8 @@ html[data-theme='dark'] .email select {
   margin: 0;
 }
 .cont {
+  display: flex;
+  gap: 8px;
   padding-top: 10px;
 }
 .error {

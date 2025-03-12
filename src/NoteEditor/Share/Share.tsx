@@ -2,7 +2,7 @@ import Note from '../../lib/Note';
 import { useRef, useState, type KeyboardEvent, type ChangeEvent } from 'react';
 import './Share.css';
 import CloseIcon from '@mui/icons-material/Close';
-import { Add, Check, Edit, Lock, Public, Visibility, Warning } from '@mui/icons-material';
+import { Add, Check, Edit, Link, Lock, Public, Visibility, Warning } from '@mui/icons-material';
 
 interface ShareItem {
   email: string;
@@ -65,6 +65,11 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
     }
   }
 
+  function copyLink() {
+    navigator.clipboard.writeText(window.location.href);
+    alert('Link copied to clipboard!');
+  }
+
   function updatePermission(
     email: { email: string; name: string; permission: 'edit' | 'view' },
     index: number,
@@ -110,7 +115,7 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
           </div>
           <div className="btn-row">
             <Check />
-            <span>Shared with {shareResult.successes.length} account(s).</span>
+            <span>Share permissions updated.</span>
           </div>
           {shareResult.failures.length > 0 && (
             <>
@@ -209,6 +214,11 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
         <div className="cont">
           <button id="submitBtn" onClick={shareNote} disabled={shareLoading}>
             Save
+          </button>
+          <div style={{ flexGrow: 1 }} />
+          <button id="submitBtn" onClick={copyLink} disabled={shareLoading}>
+            <Link />
+            <span style={{ marginLeft: '4px' }}>Copy link</span>
           </button>
         </div>
       </div>

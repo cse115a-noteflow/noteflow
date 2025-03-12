@@ -16,9 +16,14 @@ function Editor({
 }) {
   // Need to use useCallback here so that we know when the Ref is updated
   const [quill, setQuill] = useState<Quill | null>(null);
+  const [hasEditPermissions, setHasEditPermissions] = useState(false);
   const quillRef = useCallback((quill: Quill | null) => {
     setQuill(quill);
   }, []);
+
+  useEffect(() => {
+    setHasEditPermissions(note.hasEditPermissions());
+  }, [note.permissions.global, note.permissions.edit, note.owner]);
 
   function focusFirstLine() {
     if (!quill) return;
@@ -36,6 +41,8 @@ function Editor({
       note.addListener((type) => {
         if (type === 'realtime-start') {
           focusFirstLine();
+        } else if (type === 'noteUpdate') {
+          setHasEditPermissions(note.hasEditPermissions());
         }
       });
       return () => note.destroySession();
@@ -47,6 +54,7 @@ function Editor({
       <Toolbar
         note={note}
         quill={quill}
+        hasEditPermissions={hasEditPermissions}
         setShareShown={setShareShown}
         toggleSidebarCollapsed={toggleSidebarCollapsed}
       />
@@ -54,6 +62,7 @@ function Editor({
         key={note.id}
         placeholder="Write something new..."
         defaultValue={note.import()}
+        readOnly={!hasEditPermissions}
         ref={quillRef}
       />
     </main>

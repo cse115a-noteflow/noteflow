@@ -1,3 +1,4 @@
+import { FieldValue } from 'firebase/firestore';
 import { Delta } from 'quill';
 
 interface PartialNote {
@@ -14,6 +15,8 @@ interface SerializedNote extends PartialNote {
   description: string;
   content: Block[];
   owner: string;
+  createdAt: FieldValue;
+  updatedAt: FieldValue;
   cursors?: { [uid: string]: SerializedCursor };
   permissions: Permissions;
 }

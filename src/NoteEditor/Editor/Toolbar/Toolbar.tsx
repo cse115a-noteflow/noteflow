@@ -9,11 +9,13 @@ function Toolbar({
   note,
   quill,
   setShareShown,
+  hasEditPermissions,
   toggleSidebarCollapsed
 }: {
   note: Note;
   quill: Quill | null;
   setShareShown: (value: boolean) => void;
+  hasEditPermissions: boolean;
   toggleSidebarCollapsed: () => void;
 }) {
   const [isSaving, setIsSaving] = useState(false);
@@ -29,6 +31,21 @@ function Toolbar({
 
     document.dispatchEvent(new CustomEvent('noteSaved'));
   }
+
+  function detectSave(e: KeyboardEvent) {
+    if (e.ctrlKey && e.key === 's') {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!isSaving) save();
+    }
+  }
+
+  useEffect(() => {
+    document.addEventListener('keydown', detectSave);
+    return () => {
+      document.removeEventListener('keydown', detectSave);
+    };
+  });
 
   useEffect(() => {
     if (note.owner === note.api.user?.uid) {
@@ -63,12 +80,16 @@ function Toolbar({
         <Menu />
       </button>
       <hr />
-      {quill && <TextToolbar quill={quill} />}
-      <div className="tools media">
-        <button onClick={addMedia}>
-          <Add />
-        </button>
-      </div>
+      {hasEditPermissions && (
+        <>
+          {quill && <TextToolbar quill={quill} />}
+          <div className="tools media">
+            <button onClick={addMedia}>
+              <Add />
+            </button>
+          </div>
+        </>
+      )}
       <div style={{ flexGrow: '1' }} />
       <span>{note.documentRef ? <Wifi /> : <WifiOff />}</span>
       <div className="tools-share">
@@ -77,7 +98,7 @@ function Toolbar({
             Share
           </button>
         )}
-        <button onClick={save} disabled={isSaving}>
+        <button onClick={save} disabled={isSaving || !hasEditPermissions}>
           Save
         </button>
       </div>

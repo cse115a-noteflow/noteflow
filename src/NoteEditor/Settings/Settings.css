@@ -16,6 +16,7 @@
 .modal-inner hr {
   background-color: var(--border-color);
   width: 100%;
+  border: none;
   height: 1px;
   margin-bottom: 1em;
 }
