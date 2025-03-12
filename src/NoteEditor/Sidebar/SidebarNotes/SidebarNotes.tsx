@@ -5,13 +5,14 @@ import {
   VerticalAlignTop,
   VerticalAlignBottom,
   Add,
-  DescriptionOutlined,
-  Close
+  Close,
+  EditOffOutlined
 } from '@mui/icons-material';
 import { useEffect, useState } from 'react';
 import { PartialNote } from '../../../lib/types';
 import Note from '../../../lib/Note';
 import { throttle } from 'lodash';
+import NoteItem from './NoteItem';
 
 function SidebarNotes({
   setId,
@@ -27,6 +28,8 @@ function SidebarNotes({
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [attemptDelete, setAttemptDelete] = useState<PartialNote | null>(null);
+  const [loadingDelete, setLoadingDelete] = useState(false);
 
   async function loadMore(reset = false) {
     console.log('Loading notes');
@@ -50,6 +53,23 @@ function SidebarNotes({
       console.error('Error fetching notes:', error);
     }
     setLoading(false);
+  }
+
+  async function handleDelete(noteToDelete: PartialNote) {
+    setLoadingDelete(true);
+    if (note?.id === noteToDelete.id) {
+      setId(null);
+    }
+    if (noteToDelete.id) {
+      try {
+        await api.deleteNote(noteToDelete.id);
+        setAttemptDelete(null);
+        loadMore(true);
+      } catch {
+        alert("Couldn't delete the note.");
+      }
+    }
+    setLoadingDelete(false);
   }
 
   const throttleLoad = throttle(() => loadMore(true), 2000, {
@@ -104,19 +124,21 @@ function SidebarNotes({
         </button>
       </div>
       <div className="note-list">
-        {notes.length === 0 && !loading && <div>No notes found</div>}
-        {notes.map((noteItem) => (
-          <div
-            key={noteItem.id}
-            className={`note-card ${noteItem.id === (note?.id || null) ? 'selected' : ''}`}
-            onClick={() => setId(noteItem.id)}
-          >
-            <DescriptionOutlined />
-            <div className="text">
-              <h3>{noteItem.title}</h3>
-              <p>{noteItem.description}</p>
-            </div>
+        {notes.length === 0 && !loading && (
+          <div className="initial">
+            <EditOffOutlined fontSize="large" />
+            When you save a note to the cloud, it'll show up here.
           </div>
+        )}
+        {notes.map((noteItem) => (
+          <NoteItem
+            key={noteItem.id}
+            note={noteItem}
+            setId={setId}
+            selected={note?.id === noteItem.id}
+            owned={noteItem.owner === api.user?.uid}
+            onDelete={() => setAttemptDelete(noteItem)}
+          />
         ))}
         {!loading && cursor && (
           <button onClick={() => loadMore()} className="load-more-btn">
@@ -129,6 +151,28 @@ function SidebarNotes({
             <div className="skeleton" style={{ height: 75, borderRadius: 20 }} />
             <div className="skeleton" style={{ height: 75, borderRadius: 20 }} />
           </>
+        )}
+        {/* Delete */}
+        {attemptDelete && (
+          <div className="modal" onClick={() => setAttemptDelete(null)}>
+            <div className="modal-inner" onClick={(e) => e.stopPropagation()}>
+              <h2>Delete "{attemptDelete.title}"?</h2>
+              <p>This action cannot be undone.</p>
+              <div className="btn-row">
+                <button onClick={() => setAttemptDelete(null)}>Cancel</button>
+                <button
+                  className="danger-btn"
+                  disabled={loadingDelete}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleDelete(attemptDelete);
+                  }}
+                >
+                  Yes, I really want to delete
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>
