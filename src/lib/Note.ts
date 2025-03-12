@@ -1,4 +1,4 @@
-import { doc, DocumentReference, onSnapshot, setDoc } from 'firebase/firestore';
+import { doc, DocumentReference, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
 import API from './API';
 import EventEmitter from './EventEmitter';
 import { Block, FlashCard, Permissions, SerializedNote, SerializedCursor } from './types';
@@ -40,7 +40,8 @@ class Note extends EventEmitter {
       this.permissions = note.permissions;
       this.documentRef = doc(api.firestore, 'notes', this.id);
     } else {
-      this.id = '';
+      // Not a real note id, but used to set it apart
+      this.id = 'DRAFT-' + v4();
       this.title = 'Unnamed Note';
       this.description = '';
       this.cursors = {};
@@ -56,7 +57,9 @@ class Note extends EventEmitter {
       this.owner = api.user?.uid ?? '';
       this.permissions = {
         global: null,
-        user: {}
+        edit: [],
+        view: [],
+        names: {}
       };
       this.documentRef = null;
     }
@@ -64,6 +67,7 @@ class Note extends EventEmitter {
     this.throttleSave = throttle(async () => {
       if (this.quill && this.documentRef && this.api.user) {
         const saving: { [key: string]: unknown } = {};
+        saving.updatedAt = serverTimestamp();
 
         if (this.hasLocalChanges) {
           saving.content = this.export(this.quill.getContents());
@@ -94,7 +98,7 @@ class Note extends EventEmitter {
 
   serialize(): SerializedNote {
     return {
-      id: this.id,
+      id: this.id.startsWith('DRAFT-') ? '' : this.id,
       title: this.title,
       description: this.description,
       content: this.content,
@@ -108,11 +112,12 @@ class Note extends EventEmitter {
   }
 
   async setTitle(newTitle: string) {
+    if (newTitle === this.title) return;
     const userId = this.api.user?.uid;
     if (!userId) return false;
     if (
       this.owner !== userId &&
-      this.permissions.user[userId]?.permission !== 'edit' &&
+      this.permissions.edit.includes(userId) &&
       this.permissions.global !== 'edit'
     ) {
       alert('You do not have permission to edit this note.');
@@ -120,6 +125,9 @@ class Note extends EventEmitter {
     }
     this.title = newTitle || 'Unnamed Note';
     this.emit();
+    if (this.documentRef) {
+      await setDoc(this.documentRef, { title: newTitle }, { merge: true });
+    }
   }
 
   /* Firebase realtime */

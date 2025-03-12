@@ -7,7 +7,8 @@ import {
   School,
   ContentCopy,
   Close,
-  Notes
+  Notes,
+  CloudOff
 } from '@mui/icons-material';
 import '../Sidebar.css';
 import { useEffect, useState } from 'react';
@@ -73,10 +74,10 @@ function SidebarDetails({
         forceUpdate((prev) => prev + 1);
       }
       if (type === 'save') {
-        setIsSaved(!!note.id);
+        setIsSaved(!!note.documentRef);
       }
     };
-    setIsSaved(!!note.id);
+    setIsSaved(!!note.documentRef);
 
     note.addListener(update);
     return () => note.removeListener(update);
@@ -92,6 +93,10 @@ function SidebarDetails({
       if (input) {
         input.focus();
         input.addEventListener('blur', () => setEditing(false));
+      }
+    } else {
+      if (draftName !== note?.title) {
+        submitName();
       }
     }
   }, [editing]);
@@ -114,6 +119,12 @@ function SidebarDetails({
               />
             )}
             <p>{note ? note.description : ''}</p>
+            {!isSaved && (
+              <div className="notice">
+                <CloudOff />
+                <span>Unsaved changes</span>
+              </div>
+            )}
           </div>
         )}
       </div>
