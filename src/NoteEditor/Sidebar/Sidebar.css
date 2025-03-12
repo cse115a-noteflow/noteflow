@@ -12,9 +12,12 @@
   border-width: 0;
   box-shadow: none;
 }
+html[data-theme='dark'] .sidebar-wrapper {
+  border-color: #444;
+}
 .sidebar {
   height: 100%;
-  background-color: #d9d9d9;
+  background-color: var(--background-color);
   width: 350px;
   display: flex;
   flex-direction: column;
@@ -29,6 +32,7 @@
   display: flex;
   gap: 8px;
   align-items: center;
+  color: var(--primary-text);
 }
 .sidebar-details {
   flex-shrink: 0;
@@ -48,7 +52,7 @@
 .sidebar-header input.title {
   background-color: transparent;
   white-space: wrap;
-  color: #333;
+  color: var(--primary-text);
   width: 100%;
   font-size: 1.5em;
   border: none;
@@ -58,6 +62,16 @@
 .sidebar-header p {
   margin: 0;
 }
+.notice {
+  font-style: italic;
+  color: #444;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+html[data-theme='dark'] .notice {
+  color: #aaa;
+}
 
 .sidebar-actions {
   display: flex;
@@ -65,15 +79,16 @@
   gap: 8px;
   padding: 16px 0;
   align-items: stretch;
-  border-bottom: 1px solid #000;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .search {
   display: flex;
   gap: 8px;
   padding: 8px 16px;
-  background-color: #fff;
+  background-color: var(--foreground-color);
   border-radius: 20px;
+  color: var(--button-color);
 }
 
 .search button {
@@ -103,7 +118,7 @@
 
 .search-result {
   padding: 16px;
-  background-color: #eee;
+  background-color: var(--accent-color);
   border-radius: 20px;
   display: flex;
   gap: 8px;
@@ -127,12 +142,12 @@
   border: none;
 }
 .search-actions button:hover {
-  background-color: #ddd;
+  background-color: var(--hover-color);
 }
 .skeleton {
   width: 100%;
   animation: scroll 1s linear infinite;
-  background: linear-gradient(90deg, #999 0%, #ddd 50%, #999 100%);
+  background: var(--skeleton-gradient);
   background-size: 200% 100%;
   border-radius: 0.5em;
   height: 1em;
@@ -185,6 +200,10 @@
   display: flex;
   gap: 8px;
   overflow: hidden;
+  border: 1px solid #fff;
+}
+.note-card.selected {
+  border-color: #000;
 }
 .note-card h3,
 .note-card p {
@@ -203,7 +222,15 @@
   width: 100%;
 }
 
-.button-container{
+.button-container {
   display: flex;
   gap: 10px;
+}
+html[data-theme='dark'] .note-card {
+  background-color: #333;
+  color: var(--primary-text);
+  border-color: #333;
+}
+html[data-theme='dark'] .note-card.selected {
+  border-color: #ccc;
 }

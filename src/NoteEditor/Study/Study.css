@@ -12,6 +12,9 @@
   align-items: center;
   margin-top: 40px;
 }
+.nav-content h2 {
+  margin: 0;
+}
 
 .card {
   width: 100%;
@@ -47,7 +50,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: #f9f9f9;
+  background-color: var(--accent-color);
   font-size: 20px;
   padding: 20px;
   position: absolute;
@@ -57,7 +60,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f9f9f9;
+  background-color: var(--accent-color);
   transform: rotateY(180deg);
   font-size: 20px;
   padding: 20px;

@@ -1,18 +1,27 @@
 import API from '../../lib/API';
 import './Settings.css';
 import { Close } from '@mui/icons-material';
-import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 function SettingsMenu({
   api,
-  setSettingsShown
+  setSettingsShown,
+  isDarkMode,
+  setIsDarkMode
 }: {
   api: API;
   setSettingsShown: (value: boolean) => void;
+  isDarkMode: boolean;
+  setIsDarkMode: (value: boolean) => void;
 }) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const navigate = useNavigate();
+  function handleSignOut() {
+    api.signOut();
+    navigate('/login');
+  }
+
   return (
-    <div className="modal">
-      <div className="modal-inner">
+    <div className="modal" onClick={() => setSettingsShown(false)}>
+      <div className="modal-inner" onClick={(e) => e.stopPropagation()}>
         <div className="settings-container">
           <h2>Settings</h2>
           <div className="option">
@@ -27,7 +36,7 @@ function SettingsMenu({
           <hr />
           <div className="option">
             <label>Sign out</label>
-            <button onClick={api.signOut}>Sign Out</button>
+            <button onClick={handleSignOut}>Sign Out</button>
           </div>
           <button className="closeBtn" onClick={() => setSettingsShown(false)}>
             <Close />

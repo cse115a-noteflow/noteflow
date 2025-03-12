@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import NoteEditor from './NoteEditor/NoteEditor';
 import API from './lib/API';
 
@@ -8,6 +8,9 @@ import { initializeApp } from 'firebase/app';
 // Import React Firebase hooks
 import { useAuthState } from 'react-firebase-hooks/auth';
 import Login from './Login/Login';
+
+// Import Routing
+import { HashRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -24,26 +27,32 @@ const app = initializeApp(firebaseConfig);
 
 function App() {
   const [api] = useState(new API(app));
-  const [user] = useAuthState(api.auth);
-  const [isFirebaseReady, setIsFirebaseReady] = useState(false);
+  const [user, loading] = useAuthState(api.auth);
 
-  useEffect(() => {
-    const unsubscribe = api.auth.onAuthStateChanged(() => {
-      setIsFirebaseReady(true);
-      unsubscribe();
-    });
-  });
-
-  console.log('User:', user);
-
-  if (!user && isFirebaseReady) {
-    return <Login api={api} />;
-  } else if (!user) {
+  if (loading) {
     return <div>Loading...</div>;
   }
 
-  // todo: routing
-  return <NoteEditor api={api} />;
+  const ProtectedRoute = () => {
+    if (!user) {
+      return <Navigate to="/login" replace />;
+    }
+    return <Outlet />;
+  };
+
+  return (
+    <HashRouter>
+      <Routes>
+        <Route path="/" element={<Navigate to="/note" replace />} />
+        <Route path="/login" element={<Login api={api} />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="note" element={<NoteEditor api={api} />} />
+          <Route path="note/:id" element={<NoteEditor api={api} />} />
+        </Route>
+        <Route path="*" element={<div>404 - Page Not Found</div>} />
+      </Routes>
+    </HashRouter>
+  );
 }
 
 export default App;

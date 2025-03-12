@@ -4,16 +4,28 @@ import './Share.css';
 import CloseIcon from '@mui/icons-material/Close';
 import { Add, Check, Edit, Lock, Public, Visibility, Warning } from '@mui/icons-material';
 
+interface ShareItem {
+  email: string;
+  name: string;
+  permission: 'edit' | 'view';
+}
+
+const createInitalState = (note: Note) => {
+  const edits = note.permissions.edit.map((uid) => ({
+    email: uid,
+    name: note.permissions.names[uid],
+    permission: 'edit'
+  }));
+  const views = note.permissions.view.map((uid) => ({
+    email: uid,
+    name: note.permissions.names[uid],
+    permission: 'view'
+  }));
+  return [...edits, ...views] as ShareItem[];
+};
+
 function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boolean) => void }) {
-  const [draftEmails, setDraftEmails] = useState<
-    { email: string; name: string; permission: 'edit' | 'view' }[]
-  >(
-    Object.keys(note.permissions.user).map((email) => ({
-      email,
-      name: note.permissions.user[email].name,
-      permission: note.permissions.user[email].permission
-    }))
-  );
+  const [draftEmails, setDraftEmails] = useState<ShareItem[]>(createInitalState(note));
   const [globalPermission, setGlobalPermission] = useState(note.permissions.global);
   const [draftError, setDraftError] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -28,6 +40,10 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
   function validateEmail() {
     // Match email with a regular expression
     const value = inputRef.current?.value.trim();
+    if (value === note.api.user?.email) {
+      setDraftError("That's your email!");
+      return;
+    }
     if (value && value.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
       if (draftEmails.map((x) => x.email).includes(value)) {
         setDraftError('Already added ' + value);
@@ -166,7 +182,7 @@ function Share({ note, setShareShown }: { note: Note; setShareShown: (value: boo
           ))}
           {draftEmails.length === 0 && (
             <p style={{ margin: '8px', fontStyle: 'italic' }}>
-              Enter an email to share with a specific user...
+              Enter user associated email(s) to share...
             </p>
           )}
         </div>
