@@ -4,13 +4,21 @@
   border: 2px solid #eee;
   border-radius: 10px;
   outline: none;
-  transition: border-color 0.3s ease;
+  transition: border-color 0.2s ease;
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   width: calc(100% - 16px);
   resize: none;
 }
 .email-input:hover {
   border-color: #ddd;
+}
+html[data-theme='dark'] .email-input {
+  background-color: var(--background-color);
+  color: var(--primary-text);
+  border-color: #444;
+}
+html[data-theme='dark'] .email-input:hover {
+  border-color: var(--button-color);
 }
 .email-list {
   border: 1px solid #ddd;
@@ -19,8 +27,9 @@
   overflow-y: auto;
   border-radius: 5px;
 }
-.email-list:not(:has(.email)) {
-  border-top: none;
+html[data-theme='dark'] .email-list {
+  background-color: #333;
+  border-color: #444;
 }
 .email {
   display: flex;
@@ -28,7 +37,7 @@
   align-items: center;
   padding: 8px;
   gap: 8px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--border-color);
 }
 .email-list .email:last-child {
   border-bottom: none;
@@ -45,6 +54,9 @@
   outline: none;
   font-family: unset;
 }
+html[data-theme='dark'] .email select {
+  background-color: var(--background-color);
+}
 .close-btn {
   background-color: transparent;
   border-color: transparent;
@@ -58,8 +70,8 @@
 .close-btn:focus-visible,
 .close-btn:active {
   outline: none;
-  border-color: #aaa;
-  background-color: #ccc;
+  border-color: var(--button-color);
+  background-color: var(--hover-color);
 }
 .header-cont {
   display: flex;

@@ -1,0 +1,118 @@
+.closeBtn {
+  margin: auto;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  border: none;
+}
+.closeBtn:hover {
+  background-color: #ddd;
+}
+
+.modal-inner {
+  color: var(--primary-text);
+  background-color: var(--modal-color);
+}
+.modal-inner hr {
+  background-color: var(--border-color);
+  width: 100%;
+  height: 1px;
+  margin-bottom: 1em;
+}
+.modal-inner h2 {
+  font-size: 1.5em;
+  margin-top: 0;
+  margin-bottom: 1em;
+}
+
+.header-cont {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  margin-bottom: 1em;
+  justify-content: space-between;
+}
+
+.switch-button {
+  margin-top: 10px;
+  position: relative;
+  width: 55px;
+  height: 30px;
+  background-color: #e1e1e1;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  border: none;
+}
+
+.switch-button.on {
+  background-color: #424059;
+}
+
+.switch-handle {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 20px;
+  height: 20px;
+  background-color: #fff;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+.switch-button.on .switch-handle {
+  transform: translateX(25px);
+}
+
+.settings-header {
+  align-items: center;
+}
+.switch-container {
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+:root {
+  --background-color: #d9d9d9;
+  --foreground-color: #ffffff;
+  --primary-text: #111;
+  --secondary-text: #555;
+  --border-color: #000;
+  --button-color: #000;
+  --accent-color: #eee;
+  --hover-color: #ddd;
+  --disabled-opacity: 0.5;
+  --skeleton-gradient: linear-gradient(90deg, #999 0%, #ddd 50%, #999 100%);
+  --background-toolbar-color: #eee;
+  --quill-background-color: #ffffff;
+  --note-editor-background-color: #eee;
+  --modal-color: #fff;
+}
+
+/* Dark Mode */
+[data-theme='dark'] {
+  --background-color: #1e1e1e;
+  --foreground-color: #2b2b2b;
+  --primary-text: #e0e0e0;
+  --secondary-text: #bbb;
+  --border-color: #444;
+  --button-color: #e0e0e0;
+  --accent-color: #444;
+  --hover-color: #555;
+  --disabled-opacity: 0.3;
+  --skeleton-gradient: linear-gradient(90deg, #555 0%, #777 50%, #555 100%);
+  --text-background: #2b2b2b;
+  --background-toolbar-color: #444;
+  --quill-background-color: #444;
+  --note-editor-background-color: #2b2b2b;
+  --modal-color: #1e1e1e;
+}

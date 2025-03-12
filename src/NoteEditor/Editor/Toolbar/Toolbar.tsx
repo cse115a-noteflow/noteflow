@@ -34,6 +34,8 @@ function Toolbar({
     await note.save();
     setIsSaving(false);
     setIsSharable(true);
+    
+    document.dispatchEvent(new CustomEvent("noteSaved"));
   }
 
   useEffect(() => {

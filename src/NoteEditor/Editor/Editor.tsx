@@ -74,7 +74,7 @@ function Editor({
   }, [iink]);
 
   return (
-    <main>
+    <main key={note.id}>
       <Toolbar
         note={note}
         quill={quill}

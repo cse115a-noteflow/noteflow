@@ -18,13 +18,18 @@ function Summary({ note }: { note: Note }) {
 
   useEffect(() => {
     generate();
-  }, [note]);
+  }, []);
 
   if (summary === null) {
     return <p>Loading...</p>;
   }
 
-  return <div className="summary">{summary && <p>{summary}</p>}</div>;
+  return (
+    <div className="summary">
+      <h2>Summary</h2>
+      {summary && <p>{summary}</p>}
+    </div>
+  );
 }
 
 export default Summary;

@@ -12,7 +12,7 @@ main {
   border-top: none !important;
   margin: 0 auto;
   position: relative;
-  background-color: #fff;
+  background-color: var(--quill-background-color);
   border-radius: 0 0 12px 12px;
   height: fit-content;
   margin-bottom: 2em;
@@ -35,6 +35,9 @@ main {
   margin-block-end: 0.5em;
   margin-inline-start: 0px;
   margin-inline-end: 0px;
+}
+.ql-editor.ql-blank::before {
+  color: var(--secondary-text);
 }
 .ql-editor img {
   border-radius: 8px;

@@ -1,4 +1,5 @@
 import Note from '../../../lib/Note';
+import API from '../../../lib/API';
 import {
   DescriptionOutlined,
   Send,
@@ -6,18 +7,26 @@ import {
   School,
   ContentCopy,
   Close,
-  Notes
+  Notes,
+  CloudOff
 } from '@mui/icons-material';
 import '../Sidebar.css';
 import { useEffect, useState } from 'react';
 import { type StudyMode } from '../../Study/Study';
+import SettingsMenu from '../../Settings/Settings';
 
 function SidebarDetails({
   note,
-  setStudyMode
+  setStudyMode,
+  api,
+  isDarkMode,
+  setIsDarkMode
 }: {
   note: Note | null;
   setStudyMode: (value: StudyMode) => void;
+  api: API;
+  isDarkMode: boolean;
+  setIsDarkMode: (value: boolean) => void;
 }) {
   const [_, forceUpdate] = useState(0);
   const [editing, setEditing] = useState(false);
@@ -27,6 +36,7 @@ function SidebarDetails({
   const [query, setQuery] = useState('');
   const [loadingResult, setLoadingResult] = useState(false);
   const [searchResult, setSearchResult] = useState<string | null>(null);
+  const [settingsShown, setSettingsShown] = useState(false);
 
   function submitName() {
     note?.setTitle(draftName);
@@ -64,10 +74,10 @@ function SidebarDetails({
         forceUpdate((prev) => prev + 1);
       }
       if (type === 'save') {
-        setIsSaved(!!note.id);
+        setIsSaved(!!note.documentRef);
       }
     };
-    setIsSaved(!!note.id);
+    setIsSaved(!!note.documentRef);
 
     note.addListener(update);
     return () => note.removeListener(update);
@@ -83,6 +93,10 @@ function SidebarDetails({
       if (input) {
         input.focus();
         input.addEventListener('blur', () => setEditing(false));
+      }
+    } else {
+      if (draftName !== note?.title) {
+        submitName();
       }
     }
   }, [editing]);
@@ -105,6 +119,12 @@ function SidebarDetails({
               />
             )}
             <p>{note ? note.description : ''}</p>
+            {!isSaved && (
+              <div className="notice">
+                <CloudOff />
+                <span>Unsaved changes</span>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -161,9 +181,17 @@ function SidebarDetails({
           </div>
         )}
         <div className="btn-row">
-          <button>
+          <button onClick={() => setSettingsShown(true)}>
             <Settings />
           </button>
+          {api !== null && settingsShown && (
+            <SettingsMenu
+              api={api}
+              setSettingsShown={setSettingsShown}
+              isDarkMode={isDarkMode}
+              setIsDarkMode={setIsDarkMode}
+            />
+          )}
           <button
             title="Generate flashcards"
             onClick={() => setStudyMode('flashcards')}

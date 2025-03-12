@@ -14,19 +14,26 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background-color: #efefef;
+  background-color: var(--background-color);
   border-bottom: 1px solid black;
 }
 .toolbar button:focus-visible {
   outline: none;
 }
+
+.transparentBtn svg {
+  background-color: transparent;
+  color: var(--button-color); /* Ensures the icon follows theme text color */
+}
+
 hr {
   width: 1px;
   height: 100%;
-  background-color: #aaa;
+  background-color: var(--accent-color);
   margin: 0;
   border: none;
 }
+
 .tools-share {
   display: flex;
   gap: 5px;
@@ -35,7 +42,7 @@ hr {
 .toolbar .group {
   display: flex;
   gap: 2px;
-  background-color: #ccc;
+  background-color: var(--accent-color);
   border-radius: 50px;
   height: 100%;
 }
@@ -55,7 +62,10 @@ button.format {
   margin: 2px 0;
 }
 button.active {
-  background-color: #ddd;
+  background-color: #ccc;
+}
+html[data-theme='dark'] button.active {
+  background-color: #222 !important;
 }
 
 .toolbar .tools > .format:first-child,
