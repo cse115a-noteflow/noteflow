@@ -26,7 +26,7 @@ function SidebarNotes({
   const [cursor, setCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   async function loadMore(reset = false) {
     console.log('Loading notes');
@@ -41,7 +41,7 @@ function SidebarNotes({
     if (loading) return;
     setLoading(true);
     try {
-      const result = await api.getNotes(searchQuery, oldCursor);
+      const result = await api.getNotes(searchQuery, sortOrder, oldCursor);
       if (result) {
         setNotes([...oldNotes, ...result.results]);
         setCursor(result.cursor);
@@ -52,7 +52,10 @@ function SidebarNotes({
     setLoading(false);
   }
 
-  const throttleLoad = throttle(() => loadMore(true), 2000);
+  const throttleLoad = throttle(() => loadMore(true), 2000, {
+    leading: true,
+    trailing: false
+  });
 
   useEffect(() => {
     throttleLoad();
@@ -102,16 +105,16 @@ function SidebarNotes({
       </div>
       <div className="note-list">
         {notes.length === 0 && !loading && <div>No notes found</div>}
-        {notes.map((note) => (
+        {notes.map((noteItem) => (
           <div
-            key={note.id}
-            className={`note-card ${note.id === (note?.id || null) ? 'selected' : ''}`}
-            onClick={() => setId(note.id)}
+            key={noteItem.id}
+            className={`note-card ${noteItem.id === (note?.id || null) ? 'selected' : ''}`}
+            onClick={() => setId(noteItem.id)}
           >
             <DescriptionOutlined />
             <div className="text">
-              <h3>{note.title}</h3>
-              <p>{note.description}</p>
+              <h3>{noteItem.title}</h3>
+              <p>{noteItem.description}</p>
             </div>
           </div>
         ))}

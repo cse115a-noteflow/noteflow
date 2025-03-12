@@ -58,6 +58,13 @@
 .sidebar-header p {
   margin: 0;
 }
+.notice {
+  font-style: italic;
+  color: #444;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
 
 .sidebar-actions {
   display: flex;
@@ -185,6 +192,10 @@
   display: flex;
   gap: 8px;
   overflow: hidden;
+  border: 1px solid #fff;
+}
+.note-card.selected {
+  border-color: #000;
 }
 .note-card h3,
 .note-card p {

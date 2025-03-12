@@ -43,7 +43,7 @@ function Editor({
   }, [quill, note.documentRef]);
 
   return (
-    <main>
+    <main key={note.id}>
       <Toolbar
         note={note}
         quill={quill}

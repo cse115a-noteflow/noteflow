@@ -16,82 +16,30 @@ function NoteEditor({ api }: { api: API }) {
   const navigate = useNavigate();
 
   const [note, setNote] = useState<null | Note>(null);
-  const [id, setId] = useState<string | null>(null);
   const [studyMode, setStudyMode] = useState<StudyMode>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [shareShown, setShareShown] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  // useEffect(() => {
-  //   if (id !== null && note && note.id !== id) {
-  //     setNote(null);
-  //     api.getNote(id).then(setNote).catch(console.error);
-  //   } else if (id === null && note === null) {
-  //     setNote(new Note(null, api));
-  //   } else if (id === null && note && note.id !== null) {
-  //     setNote(new Note(null, api));
-  //   }
-  // }, [id, api]);
+  const [preventRefetch, setPreventRefetch] = useState(false);
 
   // routing
   const handleSetId = (newId: string | null) => {
-    setId(newId);
     if (newId) {
       navigate(`/note/${newId}`);
     } else {
+      // make a new note
+      note?.destroySession();
+      setNote(new Note(null, api));
       navigate('/note');
     }
   };
 
-  // routing (update note id to match url)
-  // before adding note check:
-  // if the user already has permission just display note
-  // else if link to the doc is shared (view or edit) then add user to note
-  // else might be empty note so return new note
-  // otherwise throw error note not loaded
-  // useEffect(() => {
-  //   async function loadNote() {
-  //     console.log('Starting loadNote function');
-  //     console.log('params.id:', params.id);
-  //     if (params.id !== null) {
-  //       console.log('Attempting to load note');
-  //       setIsLoading(true);
-  //       try {
-  //         const loadedNote = await api.getNote(params.id ?? '');
-  //         console.log('Loaded note:', loadedNote);
-  //         setNote(loadedNote);
-  //       } catch (error) {
-  //         console.error('Failed to load note:', error);
-  //         console.log('Attempting to add from shared link');
-  //         try {
-  //           const result = await api.addNoteFromSharedLink(params.id ?? '');
-  //           console.log('Result from addNoteFromSharedLink:', result);
-  //           if (result) {
-  //             const sharedNote = await api.getNote(params.id ?? '');
-  //             console.log('Shared note loaded:', sharedNote);
-  //             setNote(sharedNote);
-  //           } else {
-  //             console.error('Failed to add shared note');
-  //             // Handle the case where the shared link is invalid or expired
-  //             setNote(null);
-  //           }
-  //         } catch (sharedError) {
-  //           console.error('Error adding note from shared link:', sharedError);
-  //           // Handle the error, maybe set an error state
-  //           setNote(null);
-  //         }
-  //       } finally {
-  //         setIsLoading(false);
-  //       }
-  //     } else {
-  //       console.log('Creating new note');
-  //       setNote(new Note(null, api));
-  //     }
-  //   }
-  //   loadNote();
-  // }, [params.id, api]);
   useEffect(() => {
     const loadNote = async () => {
+      if (preventRefetch) {
+        setPreventRefetch(false);
+        return;
+      }
       // if there isnt an id specified make new note
       if (!params.id) {
         setNote(new Note(null, api));
@@ -104,45 +52,33 @@ function NoteEditor({ api }: { api: API }) {
         const loadedNote = await api.getNote(params.id);
         if (loadedNote) {
           setNote(loadedNote);
-          return;
         }
       } catch (error) {
-        console.error('Error loading note attempting share from link:', error);
-        // if note is null user has no permissions
-
-        try {
-          const result = await api.addNoteFromSharedLink(params.id);
-          if (result) {
-            const sharedNote = await api.getNote(params.id);
-            if (sharedNote) {
-              alert('Note shared via link!');
-              setNote(sharedNote);
-              return;
-            } else {
-              throw new Error('Failed to display note after adding to user.');
-            }
-          } else {
-            alert('The link is invalid or has expired.');
-            setNote(null);
-          }
-        } catch (shareError) {
-          console.error('Unexpected error while sharing from link:', error);
-          alert('An internal error occurred while attempting to share from link.');
-        }
-        console.error('Unexpected error while loading note:', error);
-        setNote(null);
-      } finally {
-        setIsLoading(false);
+        console.error('Error loading note:', error);
+        navigate('/note');
       }
+      setIsLoading(false);
     };
 
     loadNote();
   }, [params.id, api]);
 
+  useEffect(() => {
+    const onNoteSaved = () => {
+      if (note?.id && params.id !== note.id) {
+        // Don't refetch the note when it saves
+        setPreventRefetch(true);
+        navigate(`/note/${note.id}`, { replace: true });
+      }
+    };
+    document.addEventListener('noteSaved', onNoteSaved);
+    return () => document.removeEventListener('noteSaved', onNoteSaved);
+  });
+
   return (
     <div className="note-editor">
       <Sidebar
-        note={note}
+        note={isLoading ? null : note}
         setStudyMode={setStudyMode}
         setId={handleSetId}
         api={api}
@@ -152,10 +88,22 @@ function NoteEditor({ api }: { api: API }) {
         <Study note={note} mode={studyMode} setStudyMode={setStudyMode} />
       )}
       {note !== null && shareShown && <Share note={note} setShareShown={setShareShown} />}
-      {note === null && !isLoading && (
+      {isLoading && (
         <main>
           <div className="toolbar"></div>
-          <p style={{ marginLeft: 16 }}>Loading...</p>
+          <div className="ql-wrapper">
+            <div className="ql-container ql-snow">
+              <div className="ql-editor">
+                <div
+                  className="skeleton"
+                  style={{ height: '2em', width: '75%', margin: '0.5em 0' }}
+                />
+                <div className="skeleton" style={{ height: '1em', margin: '0.5em 0' }} />
+                <div className="skeleton" style={{ height: '1em', margin: '0.5em 0' }} />
+                <div className="skeleton" style={{ height: '1em', width: '50%' }} />
+              </div>
+            </div>
+          </div>
         </main>
       )}
       {note !== null && !isLoading && (
