@@ -28,6 +28,7 @@ function _QuillEditor(
   ref: React.ForwardedRef<Quill | null>
 ) {
   const containerRef = useRef<null | HTMLDivElement>(null);
+  const internalRef = useRef<Quill | null>(null);
   const defaultValueRef = useRef<Delta | Op[]>(defaultValue ?? []);
   const onTextChangeRef = useRef(onTextChange);
   const onSelectionChangeRef = useRef(onSelectionChange);
@@ -38,6 +39,7 @@ function _QuillEditor(
   });
 
   function setRef(value: Quill | null) {
+    internalRef.current = value;
     if (typeof ref === 'function') {
       ref(value);
     } else if (ref !== null) {
@@ -45,15 +47,9 @@ function _QuillEditor(
     }
   }
 
-  function getRef() {
-    if (typeof ref === 'function') {
-      return null;
-    }
-    return ref ? ref.current : null;
-  }
-
   useEffect(() => {
-    getRef()?.enable(!readOnly);
+    console.log('readOnly', readOnly);
+    internalRef.current?.enable(!readOnly);
   }, [ref, readOnly]);
 
   useEffect(() => {
