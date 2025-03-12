@@ -1,4 +1,4 @@
-import { Add, Edit, Menu, Wifi, WifiOff } from '@mui/icons-material';
+import { Add, Menu, Wifi, WifiOff } from '@mui/icons-material';
 import Note from '../../../lib/Note';
 import './Toolbar.css';
 import { useEffect, useState } from 'react';

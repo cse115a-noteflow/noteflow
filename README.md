@@ -14,6 +14,7 @@ NoteFlow is a collaborative, AI-assisted note-taking application that helps stud
 ## How It's Made
 
 Front-end: React/TypeScript/CSS
+
 Back end: Flask/Python
 
 ## Installation
@@ -55,7 +56,9 @@ OPENAI_API_KEY='INSERT YOUR OPENAI API KEY HERE'
 PINECONE_API_KEY='INSERT YOUR PINECONE API KEY HERE'
 ```
 
-You can get and obtain your OpenAI API key [here](https://platform.openai.com/api-keys) and your Pinecone API key [here](https://docs.pinecone.io/guides/projects/manage-api-keys). 2. Run the backend server
+You can get and obtain your OpenAI API key [here](https://platform.openai.com/api-keys) and your Pinecone API key [here](https://docs.pinecone.io/guides/projects/manage-api-keys).
+
+2. Run the backend server
 
 ```
 python ./main.py
