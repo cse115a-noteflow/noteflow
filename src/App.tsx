@@ -10,7 +10,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import Login from './Login/Login';
 
 // Import Routing
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -41,7 +41,7 @@ function App() {
   };
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<Navigate to="/note" replace />} />
         <Route path="/login" element={<Login api={api} />} />
@@ -51,7 +51,7 @@ function App() {
         </Route>
         <Route path="*" element={<div>404 - Page Not Found</div>} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
