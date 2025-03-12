@@ -18,11 +18,15 @@ import SettingsMenu from '../../Settings/Settings';
 function SidebarDetails({
   note,
   setStudyMode,
-  api
+  api,
+  isDarkMode,
+  setIsDarkMode,
 }: {
   note: Note | null;
   setStudyMode: (value: StudyMode) => void;
   api: API;
+  isDarkMode: boolean;
+  setIsDarkMode: (value: boolean) => void;
 }) {
   const [_, forceUpdate] = useState(0);
   const [editing, setEditing] = useState(false);
@@ -181,7 +185,7 @@ function SidebarDetails({
             <Settings />
           </button>
           {api !== null && settingsShown && (
-            <SettingsMenu api={api} setSettingsShown={setSettingsShown} />
+            <SettingsMenu api={api} setSettingsShown={setSettingsShown} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode}/>
           )}
           <button
             title="Generate flashcards"

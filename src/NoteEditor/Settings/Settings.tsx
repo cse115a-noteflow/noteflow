@@ -5,10 +5,14 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 function SettingsMenu({
   api,
-  setSettingsShown
+  setSettingsShown,
+  isDarkMode,
+  setIsDarkMode,
 }: {
   api: API;
   setSettingsShown: (value: boolean) => void;
+  isDarkMode: boolean;
+  setIsDarkMode: (value: boolean) => void;
 }) {
   const navigate = useNavigate();
   function handleSignOut() {
@@ -16,7 +20,6 @@ function SettingsMenu({
     navigate('/login');
   }
 
-  const [isDarkMode, setIsDarkMode] = useState(false);
   return (
     <div className="modal" onClick={() => setSettingsShown(false)}>
       <div className="modal-inner" onClick={(e) => e.stopPropagation()}>

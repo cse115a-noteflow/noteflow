@@ -21,6 +21,14 @@ function NoteEditor({ api }: { api: API }) {
   const [shareShown, setShareShown] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [preventRefetch, setPreventRefetch] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    return localStorage.getItem('theme') === 'dark'; // Persist theme
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light'); // Save to localStorage
+  }, [isDark]);
 
   // routing
   const handleSetId = (newId: string | null) => {
@@ -76,13 +84,15 @@ function NoteEditor({ api }: { api: API }) {
   });
 
   return (
-    <div className="note-editor">
+    <div className="note-editor" data-theme={isDark ? "dark" : "light"}>
       <Sidebar
         note={isLoading ? null : note}
         setStudyMode={setStudyMode}
         setId={handleSetId}
         api={api}
         collapsed={sidebarCollapsed}
+        isDarkMode={isDark}
+        setIsDarkMode={setIsDark}
       />
       {note !== null && studyMode && (
         <Study note={note} mode={studyMode} setStudyMode={setStudyMode} />
@@ -118,3 +128,5 @@ function NoteEditor({ api }: { api: API }) {
 }
 
 export default NoteEditor;
+
+

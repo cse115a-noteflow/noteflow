@@ -14,12 +14,18 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background-color: #efefef;
+  background-color: var(--background-color);
   border-bottom: 1px solid black;
 }
 .toolbar button:focus-visible {
   outline: none;
 }
+
+.transparentBtn svg {
+  background-color: transparent;
+  color: var(--button-color); /* Ensures the icon follows theme text color */
+}
+
 hr {
   width: 1px;
   height: 100%;
@@ -27,6 +33,7 @@ hr {
   margin: 0;
   border: none;
 }
+
 .tools-share {
   display: flex;
   gap: 5px;
