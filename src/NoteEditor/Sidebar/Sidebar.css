@@ -202,3 +202,8 @@
   white-space: nowrap;
   width: 100%;
 }
+
+.button-container{
+  display: flex;
+  gap: 10px;
+}

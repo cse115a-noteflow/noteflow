@@ -120,13 +120,16 @@ function SidebarNotes({
         {!loading && cursor && (
           <button onClick={() => loadMore()} className="load-more-btn">Load More</button>
         )}
+        
         {note && note.owner === api.user?.uid && deleteShown &&(
           <div className="modal" onClick={() => setDeleteShown(false)}>
             <div className="modal-inner" onClick={(e) => e.stopPropagation()}>
               <h2>Delete "{note.title}"?</h2>
               <p>This action cannot be undone.</p>
-              <button onClick = {()=> setDeleteShown(false)}>Cancel</button>
-              <button onClick={(e) => {e.preventDefault(); api.deleteNote(note.id);}}>Confirm</button>
+              <div className="button-container">
+                <button onClick = {()=> setDeleteShown(false)}>Cancel</button>
+                <button onClick={(e) => {e.preventDefault(); note.destroySession(); api.deleteNote(note.id); setDeleteShown(false); loadMore(true)}}>Confirm</button>
+              </div>
             </div>
           </div>
         )}
