@@ -7,30 +7,6 @@ import { doc, Firestore, getFirestore } from 'firebase/firestore';
 import { getStorage, type FirebaseStorage } from 'firebase/storage';
 import { NotePermissionState } from './types';
 
-export const DEFAULT_DATA: SerializedNote = {
-  id: '1',
-  title: 'My First Note',
-  description: 'This is a sample note',
-  content: [
-    {
-      id: '1',
-      type: 'text',
-      position: null,
-      value: 'This is a sample note. Look, we can have formatting and everything!',
-      delta: {
-        ops: [{ insert: 'This is a sample note. Look, we can have formatting and everything!\n' }]
-      }
-    }
-  ],
-  owner: '1',
-  permissions: {
-    global: 'edit',
-    edit: [],
-    view: [],
-    names: {}
-  }
-};
-
 const ENDPOINT =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:5000'
