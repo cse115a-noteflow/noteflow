@@ -26,8 +26,8 @@ function Toolbar({
     await note.save();
     setIsSaving(false);
     setIsSharable(true);
-    
-    document.dispatchEvent(new CustomEvent("noteSaved"));
+
+    document.dispatchEvent(new CustomEvent('noteSaved'));
   }
 
   useEffect(() => {
@@ -63,19 +63,14 @@ function Toolbar({
         <Menu />
       </button>
       <hr />
-      <p>{note.documentRef ? <Wifi /> : <WifiOff />}</p>
       {quill && <TextToolbar quill={quill} />}
-      <div className="tools scribble">
-        <button>
-          <Edit />
-        </button>
-      </div>
       <div className="tools media">
         <button onClick={addMedia}>
           <Add />
         </button>
       </div>
       <div style={{ flexGrow: '1' }} />
+      <span>{note.documentRef ? <Wifi /> : <WifiOff />}</span>
       <div className="tools-share">
         {isSharable && (
           <button disabled={!note.documentRef} onClick={() => setShareShown(true)}>

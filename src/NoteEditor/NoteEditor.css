@@ -5,8 +5,9 @@
   height: 100%;
 }
 main {
-  width: 100%;
   height: 100%;
+  flex-grow: 1;
+  overflow-x: auto;
   display: flex;
   flex-direction: column;
   background-color: var(--note-editor-background-color);

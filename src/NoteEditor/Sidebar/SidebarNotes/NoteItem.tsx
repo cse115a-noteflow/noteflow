@@ -1,4 +1,4 @@
-import { DescriptionOutlined } from '@mui/icons-material';
+import { DescriptionOutlined, Delete } from '@mui/icons-material';
 import { PartialNote } from '../../../lib/types';
 
 function NoteItem({
@@ -23,12 +23,13 @@ function NoteItem({
       </div>
       {owned && (
         <button
+          className="delete-btn"
           onClick={(e) => {
             e.stopPropagation();
             onDelete();
           }}
         >
-          Delete
+          <Delete />
         </button>
       )}
     </div>

@@ -16,6 +16,10 @@
   gap: 10px;
   background-color: var(--background-color);
   border-bottom: 1px solid black;
+  overflow-x: auto;
+}
+.toolbar::-webkit-scrollbar {
+  display: none;
 }
 .toolbar button:focus-visible {
   outline: none;
@@ -26,12 +30,16 @@
   color: var(--button-color); /* Ensures the icon follows theme text color */
 }
 
-hr {
+.toolbar hr {
+  flex-shrink: 0;
   width: 1px;
   height: 100%;
-  background-color: var(--accent-color);
+  background-color: #aaa;
   margin: 0;
   border: none;
+}
+html[data-theme='dark'] .toolbar hr {
+  background-color: #555;
 }
 
 .tools-share {

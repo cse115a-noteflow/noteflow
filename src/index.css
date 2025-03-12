@@ -104,7 +104,7 @@ button:disabled {
   cursor: not-allowed;
 }
 
-html[data-theme='dark'] button {
+html[data-theme='dark'] button:not(.transparentBtn) {
   color: #fff;
   background-color: #444;
   border-color: #666;

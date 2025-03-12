@@ -161,7 +161,7 @@ function SidebarDetails({
         {!isSaved && (
           <div className="search disabled">
             <span>Save your note to search it</span>
-            <button>
+            <button className="transparentBtn">
               <Send />
             </button>
           </div>
@@ -175,7 +175,7 @@ function SidebarDetails({
               onKeyUp={(e) => e.key === 'Enter' && search()}
               placeholder="Ask about your note..."
             />
-            <button onClick={search} disabled={loadingResult}>
+            <button className="transparentBtn" onClick={search} disabled={loadingResult}>
               <Send />
             </button>
           </div>

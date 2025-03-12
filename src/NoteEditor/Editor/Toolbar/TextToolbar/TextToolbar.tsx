@@ -8,12 +8,15 @@ import {
   FormatUnderlined,
   FormatAlignLeft,
   FormatAlignCenter,
-  FormatAlignRight
+  FormatAlignRight,
+  FormatListBulleted,
+  FormatListNumbered
 } from '@mui/icons-material';
 
 function TextToolbar({ quill }: { quill: Quill }) {
   const [activeFormats, setActiveFormats] = useState<string[]>([]);
   const [align, setAlign] = useState<'left' | 'center' | 'right'>('left');
+  const [list, setList] = useState<'ordered' | 'bullet' | 'none'>('none');
 
   useEffect(() => {
     if (quill) {
@@ -30,6 +33,11 @@ function TextToolbar({ quill }: { quill: Quill }) {
           setAlign(formats.align as 'left' | 'center' | 'right');
         } else {
           setAlign('left');
+        }
+        if (formats.list) {
+          setList(formats.list as 'ordered' | 'bullet');
+        } else {
+          setList('none');
         }
       };
       quill.on('editor-change', updateFormats);
@@ -62,6 +70,20 @@ function TextToolbar({ quill }: { quill: Quill }) {
         quill.format('align', false);
       } else {
         quill.format('align', align);
+      }
+    }
+  }
+
+  function formatList(type: 'ordered' | 'bullet') {
+    if (quill) {
+      const range = quill.getSelection();
+      const formats = quill.getFormat(range ?? undefined);
+      if (formats.list === type) {
+        quill.format('list', false);
+        setList('none');
+      } else {
+        quill.format('list', type);
+        setList(type);
       }
     }
   }
@@ -115,6 +137,20 @@ function TextToolbar({ quill }: { quill: Quill }) {
           className={'format ' + (align === 'right' ? 'active' : '')}
         >
           <FormatAlignRight />
+        </button>
+      </div>
+      <div className="group">
+        <button
+          onClick={() => formatList('bullet')}
+          className={'format ' + (list === 'bullet' ? 'active' : '')}
+        >
+          <FormatListBulleted />
+        </button>
+        <button
+          onClick={() => formatList('ordered')}
+          className={'format ' + (list === 'ordered' ? 'active' : '')}
+        >
+          <FormatListNumbered />
         </button>
       </div>
     </div>
