@@ -4,11 +4,27 @@ import { useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import GoogleIcon from '@mui/icons-material/Google';
 
+// routing
+import { useNavigate } from 'react-router-dom';
+
 function Login({ api }: { api: API }) {
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // routing
+  const navigate = useNavigate();
+  const handleSignIn = async () => {
+    try {
+      await api.signInWithGoogle();
+      navigate('/');
+    } catch (error) {
+      console.error('Sign in error:', error);
+    }
+  };
+
   const toggleExpansion = () => {
     setIsExpanded((prevState) => !prevState); // Toggle the state
   };
+
   return (
     <div className="container">
       <div className="left">
@@ -29,7 +45,7 @@ function Login({ api }: { api: API }) {
       <div className="right">
         <div className="login">
           <h3>Sign in to start writing better notes.</h3>
-          <button onClick={() => api.signInWithGoogle()}>
+          <button onClick={handleSignIn}>
             <GoogleIcon className="g-icon" />
             Sign in with Google
           </button>

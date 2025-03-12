@@ -40,7 +40,8 @@ class Note extends EventEmitter {
       this.permissions = note.permissions;
       this.documentRef = doc(api.firestore, 'notes', this.id);
     } else {
-      this.id = '';
+      // Not a real note id, but used to set it apart
+      this.id = 'DRAFT-' + v4();
       this.title = 'Unnamed Note';
       this.description = '';
       this.cursors = {};
@@ -97,7 +98,7 @@ class Note extends EventEmitter {
 
   serialize(): SerializedNote {
     return {
-      id: this.id,
+      id: this.id.startsWith('DRAFT-') ? '' : this.id,
       title: this.title,
       description: this.description,
       content: this.content,
@@ -111,6 +112,7 @@ class Note extends EventEmitter {
   }
 
   async setTitle(newTitle: string) {
+    if (newTitle === this.title) return;
     const userId = this.api.user?.uid;
     if (!userId) return false;
     if (
@@ -123,6 +125,9 @@ class Note extends EventEmitter {
     }
     this.title = newTitle || 'Unnamed Note';
     this.emit();
+    if (this.documentRef) {
+      await setDoc(this.documentRef, { title: newTitle }, { merge: true });
+    }
   }
 
   /* Firebase realtime */

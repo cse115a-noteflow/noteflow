@@ -3,7 +3,7 @@ import Note from './Note';
 import { PartialNote, SerializedNote } from './types';
 import axios from 'axios';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { Firestore, getFirestore } from 'firebase/firestore';
+import { doc, Firestore, getFirestore } from 'firebase/firestore';
 import { getStorage, type FirebaseStorage } from 'firebase/storage';
 import { NotePermissionState } from './types';
 
@@ -149,9 +149,9 @@ class API {
   }
 
   // METHODS
-  async getNotes(query?: string | null, cursor?: string | null) {
+  async getNotes(query?: string | null, sortOrder: 'asc' | 'desc' = 'asc', cursor?: string | null) {
     let url = '/notes';
-    const params = [];
+    const params = [`sort=${sortOrder}`];
     if (query) params.push(`q=${encodeURIComponent(query)}`);
     if (cursor) params.push(`cursor=${encodeURIComponent(cursor)}`);
     if (params.length) url += '?' + params.join('&');
@@ -170,11 +170,15 @@ class API {
   }
 
   async saveNote(note: Note): Promise<Note | null> {
-    if (!note.id) {
+    if (!note.id || note.id.startsWith('DRAFT')) {
       // POST - create new note
       const response = await this.POST('/notes', note.serialize());
       if (response[0] !== 200) return null;
       note.id = response[1].id;
+
+      // add document ref
+      note.documentRef = doc(this.firestore, 'notes', response[1].id);
+      note.createSession();
     } else {
       const userId = note.api.user?.uid;
       if (!userId) return null;
