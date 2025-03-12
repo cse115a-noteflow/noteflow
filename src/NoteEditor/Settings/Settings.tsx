@@ -4,12 +4,15 @@ import { Close } from '@mui/icons-material';
 import { useState } from 'react';
 function SettingsMenu({
   api,
-  setSettingsShown
+  setSettingsShown,
+  isDarkMode,
+  setIsDarkMode,
 }: {
   api: API;
   setSettingsShown: (value: boolean) => void;
+  isDarkMode: boolean;
+  setIsDarkMode: (value: boolean) => void;
 }) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
   return (
     <div className="modal">
       <div className="modal-inner">
