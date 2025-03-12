@@ -21,6 +21,9 @@
   margin-inline-start: 0px;
   margin-inline-end: 0px;
 }
+.ql-editor.ql-blank::before {
+  color: var(--secondary-text);
+}
 .ql-editor img {
   border-radius: 8px;
 }

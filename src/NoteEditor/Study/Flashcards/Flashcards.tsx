@@ -12,16 +12,20 @@ function Flashcards({ note }: { note: Note }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [flashcards, setFlashcards] = useState<{ term: string; definition: string }[] | null>(null);
   const [flipped, setFlipped] = useState(false);
+  const [generating, setGenerating] = useState(false);
   async function generate() {
+    if (generating) return;
+    setGenerating(true);
     const flashcards = await note.generateFlashcards();
     if (flashcards !== null) {
       setFlashcards(flashcards);
     }
+    setGenerating(false);
   }
 
   useEffect(() => {
     generate();
-  }, [note]);
+  }, []);
 
   // card.onclick = function(){card.classList.toggle("flip")}
   function nextCard() {
@@ -39,8 +43,8 @@ function Flashcards({ note }: { note: Note }) {
     setFlipped(!flipped);
   };
 
-  if (flashcards === null) {
-    return <p>Loading...</p>;
+  if (generating || flashcards === null) {
+    return <p>Generating study flashcards...</p>;
   }
 
   if (flashcards.length === 0) {

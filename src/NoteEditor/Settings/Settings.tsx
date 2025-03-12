@@ -2,12 +2,11 @@ import API from '../../lib/API';
 import './Settings.css';
 import { Close } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
 function SettingsMenu({
   api,
   setSettingsShown,
   isDarkMode,
-  setIsDarkMode,
+  setIsDarkMode
 }: {
   api: API;
   setSettingsShown: (value: boolean) => void;

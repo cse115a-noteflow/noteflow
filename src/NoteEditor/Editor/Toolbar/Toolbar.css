@@ -29,7 +29,7 @@
 hr {
   width: 1px;
   height: 100%;
-  background-color: #aaa;
+  background-color: var(--accent-color);
   margin: 0;
   border: none;
 }
@@ -42,7 +42,7 @@ hr {
 .toolbar .group {
   display: flex;
   gap: 2px;
-  background-color: #ccc;
+  background-color: var(--accent-color);
   border-radius: 50px;
   height: 100%;
 }
@@ -62,7 +62,10 @@ button.format {
   margin: 2px 0;
 }
 button.active {
-  background-color: #ddd;
+  background-color: #ccc;
+}
+html[data-theme='dark'] button.active {
+  background-color: #222 !important;
 }
 
 .toolbar .tools > .format:first-child,

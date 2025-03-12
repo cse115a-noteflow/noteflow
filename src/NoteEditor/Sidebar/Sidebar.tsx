@@ -12,7 +12,7 @@ function Sidebar({
   api,
   collapsed,
   isDarkMode,
-  setIsDarkMode,
+  setIsDarkMode
 }: {
   note: Note | null;
   setId: (id: string | null) => void;
@@ -25,7 +25,13 @@ function Sidebar({
   return (
     <div className={'sidebar-wrapper ' + (collapsed ? 'collapsed' : '')}>
       <div className="sidebar">
-        <SidebarDetails note={note} setStudyMode={setStudyMode} api={api} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
+        <SidebarDetails
+          note={note}
+          setStudyMode={setStudyMode}
+          api={api}
+          isDarkMode={isDarkMode}
+          setIsDarkMode={setIsDarkMode}
+        />
         <SidebarNotes setId={setId} note={note} api={api} />
       </div>
     </div>

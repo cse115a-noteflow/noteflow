@@ -84,7 +84,7 @@ function NoteEditor({ api }: { api: API }) {
   });
 
   return (
-    <div className="note-editor" data-theme={isDark ? "dark" : "light"}>
+    <div className="note-editor" data-theme={isDark ? 'dark' : 'light'}>
       <Sidebar
         note={isLoading ? null : note}
         setStudyMode={setStudyMode}
@@ -128,5 +128,3 @@ function NoteEditor({ api }: { api: API }) {
 }
 
 export default NoteEditor;
-
-

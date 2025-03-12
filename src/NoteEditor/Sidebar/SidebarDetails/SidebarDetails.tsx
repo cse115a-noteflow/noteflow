@@ -20,7 +20,7 @@ function SidebarDetails({
   setStudyMode,
   api,
   isDarkMode,
-  setIsDarkMode,
+  setIsDarkMode
 }: {
   note: Note | null;
   setStudyMode: (value: StudyMode) => void;
@@ -185,7 +185,12 @@ function SidebarDetails({
             <Settings />
           </button>
           {api !== null && settingsShown && (
-            <SettingsMenu api={api} setSettingsShown={setSettingsShown} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode}/>
+            <SettingsMenu
+              api={api}
+              setSettingsShown={setSettingsShown}
+              isDarkMode={isDarkMode}
+              setIsDarkMode={setIsDarkMode}
+            />
           )}
           <button
             title="Generate flashcards"
